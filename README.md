@@ -44,21 +44,27 @@ A execução segue uma progressão clara:
 
 Objetivo: entender os dados e selecionar o modelo baseline.
 
-1. Criar `notebooks/eda_01.ipynb`
-2. Baixar amostra do dataset
-3. Explorar classes, tamanhos e exemplos
-4. Criar `full_text = title + text`
-5. Treinar 2 modelos baseline:
+### MLflow Setup
+- Rodando via Docker local:
+  - UI disponível em `http://localhost:5000`
+  - Backend local
+  - Artifacts local
+
+### `notebooks/eda_01.ipynb`
+- Baixar amostra do dataset
+- Explorar classes, tamanhos e exemplos
+- Criar `full_text = title + text`
+- Treinar 2 modelos baseline:
    - TF-IDF + LogisticRegression
    - TF-IDF + LinearSVC
-6. Avaliar métricas:
+- Avaliar métricas:
    - Accuracy
    - Precision
    - Recall
    - F1-Macro
    - Confusion Matrix
-7. Selecionar modelo “v1”
-8. Registrar runs no MLflow local
+- Selecionar modelo “v1”
+- Registrar runs no MLflow local
 
 ---
 
@@ -97,12 +103,6 @@ Implementar um pipeline reprodutível:
 ### `src/models/evaluate.py`
 - Avalia no test set global
 - Loga métricas no MLflow
-
-### MLflow Setup
-- Rodando via Docker local:
-  - UI disponível em `http://localhost:5000`
-  - Backend local
-  - Artifacts no S3 (ou local no início)
 
 ### Training Container
 - Dockerfile para treinar em ECS Task
@@ -151,10 +151,9 @@ Infra via Terraform:
 
 - S3 (datasets + artifacts)
 - ECR (imagens de treino e serving)
-- Lambda ou ECS Fargate para serving
+- ECS Fargate para serving
 - IAM Roles + GitHub OIDC
-- EventBridge (opcional para retraining futuro)
-- MLflow Tracking Server em ECS Fargate (fase avançada)
+- MLflow Tracking Server em ECS Fargate
 
 GitHub Actions:
 - build & push de imagens
