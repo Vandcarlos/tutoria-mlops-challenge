@@ -1,0 +1,5 @@
+notebook==7.4.7
+ipywidgets
+mlflow==2.21.0
+kagglehub==0.3.13
+pandas==2.3.3
