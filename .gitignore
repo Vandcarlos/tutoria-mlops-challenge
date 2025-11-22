@@ -27,6 +27,12 @@ pip-wheel-metadata/
 jupyter_cache/
 
 # -----------------------------
+# Dados locais
+# -----------------------------
+/data/
+/mlruns/
+
+# -----------------------------
 # Arquivos do sistema
 # -----------------------------
 .DS_Store

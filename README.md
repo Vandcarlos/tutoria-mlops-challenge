@@ -72,18 +72,22 @@ Objetivo: entender os dados e selecionar o modelo baseline.
 
 Transformar código do notebook em scripts reusáveis:
 
-### `src/data/ingest.py`
+### `src/model/data/ingest.py`
 - Baixa dataset (local)
 - Salva raw em `data/raw/`
 
-### `src/data/preprocess.py`
+### `src/model/data/split_batches.py`
+- Divide dataset em **10 batches** iguais
+- Salva em `data/batches/batch_0..9.parquet`
+
+### `src/model/data/preprocess_core.py`
 - Limpeza e padronização
 - Concatenação de texto
 - Salva Parquet em `data/processed/`
 
-### `src/data/split_batches.py`
-- Divide dataset em **10 batches** iguais
-- Salva em `data/batches/batch_0..9.parquet`
+### `src/model/data/preprocess_test.py`
+- Aplica o `preprocess_core` no dado de teste
+- Salva Parquet em `data/processed/`
 
 ---
 
@@ -91,7 +95,11 @@ Transformar código do notebook em scripts reusáveis:
 
 Implementar um pipeline reprodutível:
 
-### `src/models/train.py`
+### `src/model/data/preprocess_batch.py`
+- Aplica o `preprocess_core` em um batch específico
+- Salva Parquet em `data/processed/`
+
+### `src/model/pipeline/train.py`
 - Recebe `--batches 0..k`
 - Concatena batches
     > TF-IDF e modelos lineares não suportam aprendizado incremental nativo; por isso, o retraining sempre usa batch₀..batchₖ, garantindo vocabulário consistente.
@@ -100,9 +108,14 @@ Implementar um pipeline reprodutível:
 - Loga métricas no MLflow
 - Salva artefatos do modelo no MLflow → S3
 
-### `src/models/evaluate.py`
+### `src/model/pipeline/evaluate.py`
 - Avalia no test set global
 - Loga métricas no MLflow
+
+### `src/model/pipeline/predict.py`
+- Recebe `--title "title" --message "message"`
+- Formata o input
+- Faz predição do valor
 
 ### Training Container
 - Dockerfile para treinar em ECS Task
@@ -129,8 +142,8 @@ Implementar API FastAPI que carrega modelo do MLflow/S3:
 Airflow rodará *local*, mas orquestrará tarefas na AWS:
 
 - ingestão (manual)
-- preprocess
 - batch split
+- preprocess
 - treino inicial
 - retraining semanal:
   `batch_0 → batch_0..1 → batch_0..2 → …`
