@@ -5,7 +5,7 @@ import sys
 import mlflow
 from src import config as cfg
 from src.model.data.preprocess_input import preprocess_input
-from src.model.pipeline.model_resolver import resolve_model_uri
+from src.shared.model_resolver import resolve_model_uri
 
 
 def predict(model_version: str | None, title: str | None, message: str | None) -> dict:

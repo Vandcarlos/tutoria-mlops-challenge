@@ -90,7 +90,7 @@ model-predict:
 	$(MLFLOW_ENV) $(PYTHON) -m $(PREDICT)
 
 # -------------------------------
-#  Docker: imagem do MODEL
+#  Model Docker
 # -------------------------------
 
 MODEL_IMAGE      = tutoria-mlops-model:latest
@@ -144,3 +144,17 @@ docker-model-pipeline-train:
 
 docker-model-predict:
 	$(DOCKER_RUN) $(PREDICT)
+
+
+# -------------------------------
+#  API commands
+# -------------------------------
+
+RUN_API=uvicorn src.api.main:app
+
+# -------------------------------
+#  API local commands
+# -------------------------------
+
+run-api:
+	$(MLFLOW_ENV) $(PYTHON) -m $(RUN_API)

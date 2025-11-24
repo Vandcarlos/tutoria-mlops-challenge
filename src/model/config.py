@@ -25,8 +25,6 @@ KAGGLE_DATASET_NAME = os.getenv("DATASET_KAGGLE_NAME", "kritanjalijain/amazon-re
 KAGGLE_DATASET_TRAIN_FILENAME = os.getenv("DATASET_TRAIN", "train.csv")
 KAGGLE_DATASET_TEST_FILENAME = os.getenv("DATASET_TEST", "test.csv")
 
-MODEL_NAME = "sentiment-logreg-tfidf"
-
 
 @dataclass
 class TfidfParams:

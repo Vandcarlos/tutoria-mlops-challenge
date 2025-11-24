@@ -5,7 +5,7 @@ import pandas as pd
 import mlflow
 from src.model import config as cfg
 from src.model.pipeline.metrics_helper import validate
-from src.model.pipeline.model_resolver import resolve_model_uri
+from src.shared.model_resolver import resolve_model_uri
 
 
 def evaluate(model_version: str | None = None) -> None:
