@@ -19,7 +19,11 @@ def preprocess_batch(batch_idx: int) -> Path:
         )
 
     df_raw = pd.read_csv(raw_batch_path, header=None)
-    df_raw.columns = cfg.DATASET_CLEAR_COLUMNS
+    df_raw.columns = [
+        cfg.DATASET_POLARITY_COLUMN,
+        cfg.DATASET_TITLE_COLUMN,
+        cfg.DATASET_MESSAGE_COLUMN,
+    ]
 
     df_processed = preprocess_df(df_raw=df_raw)
 

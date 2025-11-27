@@ -16,17 +16,10 @@ def _bool(name: str, default: bool = False) -> bool:
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")  # local | prod
 
 # MLflow tracking
-MLFLOW_TRACKING_URI: str = os.getenv(
-    "MLFLOW_TRACKING_URI",
-    "file:./mlruns",  # default no super-dev local
-)
-
-MLFLOW_MODEL_NAME: str = os.getenv(
-    "MLFLOW_MODEL_NAME",
-    "sentiment-logreg-tfidf",
-)
-
+MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")
+MLFLOW_MODEL_NAME: str = os.getenv("MLFLOW_MODEL_NAME", "sentiment-logreg-tfidf")
 MLFLOW_MODEL_VERSION: str | None = os.getenv("MLFLOW_MODEL_VERSION")
+
 MODEL_DIR: Path = Path(os.getenv("MODEL_DIR", "./data/model")).resolve()
 
 ALLOW_RUNTIME_MODEL_DOWNLOAD: bool = _bool(

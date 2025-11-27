@@ -1,4 +1,4 @@
-import mlflow.pyfunc
+from sklearn.pipeline import Pipeline
 
 import mlflow
 from src.api.config import (
@@ -11,12 +11,12 @@ from src.api.config import (
 from src.shared.model_resolver import resolve_model_uri
 
 
-def _load_model_from_dir() -> mlflow.pyfunc.PyFuncModel:
+def _load_model_from_dir() -> Pipeline:
     print(f"[model_loader] Loading local model from: {MODEL_DIR}")
-    return mlflow.pyfunc.load_model(str(MODEL_DIR))
+    return mlflow.sklearn.load_model(str(MODEL_DIR))
 
 
-def load_model() -> mlflow.pyfunc.PyFuncModel:
+def load_model() -> Pipeline:
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
     if MODEL_DIR.exists() and any(MODEL_DIR.iterdir()):
