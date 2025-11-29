@@ -37,6 +37,7 @@ jupyter_cache/
 # -----------------------------
 .DS_Store
 Thumbs.db
+.vscode
 
 # -----------------------------
 # Configs sensíveis

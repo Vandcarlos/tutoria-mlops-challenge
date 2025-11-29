@@ -1,0 +1,14 @@
+-r requirments-api.txt
+-r requirments-model.text
+
+# Notebooks
+notebook==7.4.7
+ipywidgets==8.1.8
+
+# Code quality
+ruff==0.14.6
+nbqa==1.9.1
+
+# Tests
+pytest==9.0.1
+pytest-cov==7.10.6
