@@ -50,9 +50,9 @@ def test_dataset_default_paths(monkeypatch):
     cfg = _reload_config(monkeypatch)
 
     assert cfg.DATASET_LOCAL_PATH == Path("./data")
-    assert cfg.DATASET_RAW_DIR == cfg.DATASET_LOCAL_PATH / "raw"
-    assert cfg.DATASET_PROCESSED_DIR == cfg.DATASET_LOCAL_PATH / "processed"
-    assert cfg.DATASET_BATCH_DIR == cfg.DATASET_LOCAL_PATH / "batches"
+    assert cfg.DATASET_RAW_PATH == cfg.DATASET_LOCAL_PATH / "raw"
+    assert cfg.DATASET_PROCESSED_PATH == cfg.DATASET_LOCAL_PATH / "processed"
+    assert cfg.DATASET_BATCH_PATH == cfg.DATASET_LOCAL_PATH / "batches"
 
 
 def test_dataset_local_path_from_env(monkeypatch):
@@ -63,9 +63,9 @@ def test_dataset_local_path_from_env(monkeypatch):
     )
 
     assert cfg.DATASET_LOCAL_PATH == Path("/tmp/custom-data")
-    assert cfg.DATASET_RAW_DIR == Path("/tmp/custom-data/raw")
-    assert cfg.DATASET_PROCESSED_DIR == Path("/tmp/custom-data/processed")
-    assert cfg.DATASET_BATCH_DIR == Path("/tmp/custom-data/batches")
+    assert cfg.DATASET_RAW_PATH == Path("/tmp/custom-data/raw")
+    assert cfg.DATASET_PROCESSED_PATH == Path("/tmp/custom-data/processed")
+    assert cfg.DATASET_BATCH_PATH == Path("/tmp/custom-data/batches")
 
 
 def test_dataset_split_count_default_and_env(monkeypatch):

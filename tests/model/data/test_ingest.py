@@ -24,7 +24,7 @@ def _setup_fake_kaggle_dir(tmp_path, ingest_module) -> Path:
 def test_ingest_happy_path_copies_files_to_raw_dir(tmp_path, monkeypatch):
     """
     ingest() must:
-    - create DATASET_RAW_DIR
+    - create DATASET_RAW_PATH
     - copy train/test from Kaggle download dir
     - return the destination paths
     """
@@ -32,7 +32,7 @@ def test_ingest_happy_path_copies_files_to_raw_dir(tmp_path, monkeypatch):
 
     # Redireciona o RAW para um tmp de teste
     raw_dir = tmp_path / "raw"
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_DIR", raw_dir)
+    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
 
     # Cria um diretório fake como se fosse o download do Kaggle
     dataset_dir = _setup_fake_kaggle_dir(tmp_path, ingest_module)
@@ -74,7 +74,7 @@ def test_ingest_raises_if_train_missing(tmp_path, monkeypatch):
     from src.model.data import ingest as ingest_module
 
     raw_dir = tmp_path / "raw"
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_DIR", raw_dir)
+    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
 
     dataset_dir = tmp_path / "kaggle_download"
     dataset_dir.mkdir()
@@ -103,7 +103,7 @@ def test_ingest_raises_if_test_missing(tmp_path, monkeypatch):
     from src.model.data import ingest as ingest_module
 
     raw_dir = tmp_path / "raw"
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_DIR", raw_dir)
+    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
 
     dataset_dir = tmp_path / "kaggle_download"
     dataset_dir.mkdir()
@@ -142,7 +142,7 @@ def test_ingest_main_logs_to_mlflow(tmp_path, monkeypatch):
     raw_dir.mkdir()
 
     monkeypatch.setattr(ingest_module.cfg, "KAGGLE_DATASET_NAME", "fake/dataset")
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_DIR", raw_dir)
+    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
     monkeypatch.setattr(ingest_module.cfg, "KAGGLE_DATASET_TRAIN_FILENAME", "train.csv")
     monkeypatch.setattr(ingest_module.cfg, "KAGGLE_DATASET_TEST_FILENAME", "test.csv")
 

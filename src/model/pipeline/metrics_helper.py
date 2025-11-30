@@ -37,8 +37,8 @@ def validate(
     ValidationResult:
         Class with the computed metrics.
     """
-    acc = accuracy_score(y_pred, y_true)
-    f1 = f1_score(y_pred, y_true, average="macro")
+    acc = accuracy_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred, average="macro")
 
     mlflow.log_metric(f"{split_name}_accuracy", acc)
     mlflow.log_metric(f"{split_name}_f1_macro", f1)
@@ -46,7 +46,7 @@ def validate(
     print(f"[{split_name}] Accuracy:", acc)
     print(f"[{split_name}] F1 macro:", f1)
 
-    report = classification_report(y_pred, y_true)
+    report = classification_report(y_true, y_pred)
     print(report)
 
     if log_report:

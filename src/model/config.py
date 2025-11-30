@@ -8,14 +8,10 @@ load_dotenv()
 
 # Environments
 DATASET_LOCAL_PATH = Path(os.getenv("DATASET_LOCAL_PATH", "./data"))
-DATASET_RAW_DIR = DATASET_LOCAL_PATH / "raw"
-DATASET_PROCESSED_DIR = DATASET_LOCAL_PATH / "processed"
-DATASET_BATCH_DIR = DATASET_LOCAL_PATH / "batches"
+DATASET_RAW_PATH = DATASET_LOCAL_PATH / "raw"
+DATASET_PROCESSED_PATH = DATASET_LOCAL_PATH / "processed"
+DATASET_BATCH_PATH = DATASET_LOCAL_PATH / "batches"
 DATASET_SPLIT_COUNT = int(os.getenv("DATASET_SPLIT_COUNT", "10"))
-
-KAGGLE_DATASET_NAME = os.getenv("DATASET_KAGGLE_NAME", "kritanjalijain/amazon-reviews")
-KAGGLE_DATASET_TRAIN_FILENAME = os.getenv("DATASET_TRAIN", "train.csv")
-KAGGLE_DATASET_TEST_FILENAME = os.getenv("DATASET_TEST", "test.csv")
 
 MLFLOW_MODEL_NAME: str = os.getenv("MLFLOW_MODEL_NAME", "sentiment-logreg-tfidf")
 

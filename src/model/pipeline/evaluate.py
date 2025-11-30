@@ -10,7 +10,7 @@ from src.shared.model_resolver import resolve_model_uri
 
 
 def _load_test_dataset() -> pd.DataFrame:
-    test_path = cfg.DATASET_RAW_DIR / "test.csv"
+    test_path = cfg.DATASET_RAW_PATH / "test.csv"
     df_test = pd.read_csv(test_path, header=None)
     df_test.columns = [
         cfg.DATASET_POLARITY_COLUMN,

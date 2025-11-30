@@ -58,7 +58,7 @@ def _get_train_data_frame(batches: list[int]) -> pd.DataFrame:
     dfs: list[pd.DataFrame] = []
 
     for batch in batches:
-        batch_path = cfg.DATASET_PROCESSED_DIR / f"train_batch_{batch}.parquet"
+        batch_path = cfg.DATASET_PROCESSED_PATH / f"train_batch_{batch}.parquet"
         batch_df = pd.read_parquet(path=batch_path)
         dfs.append(batch_df)
         print(f"[TRAIN] Loaded batch {batch}: {batch_path} ({len(batch_df)} rows)")
@@ -180,7 +180,7 @@ def main():
     args = parser.parse_args()
 
     if not args.batches:
-        all_paths = sorted(cfg.DATASET_PROCESSED_DIR.glob("train_batch_*.parquet"))
+        all_paths = sorted(cfg.DATASET_PROCESSED_PATH.glob("train_batch_*.parquet"))
         batches = sorted(int(p.stem.replace("train_batch_", "")) for p in all_paths)
         print(f"[TRAIN] Auto-discovered batches: {batches}")
         return train(batches)
