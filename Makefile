@@ -163,16 +163,16 @@ API_IMAGE      = tutoria-mlops-api:latest
 API_DOCKERFILE = docker/api.Dockerfile
 API_PORT       = 8010
 
-MODEL_DIR      = $(PWD)/data/model
-MODEL_LOCALHOST = http://host.docker.internal
+API_MODEL_PATH      = $(PWD)/data/model
+API_LOCALHOST = http://host.docker.internal
 
 define API_DOCKER_RUN
-	mkdir -p $(MODEL_DIR)
+	mkdir -p $(API_MODEL_PATH)
 	docker run --rm \
 		-p $(API_PORT):8000 \
-		-e MLFLOW_TRACKING_URI="$(MODEL_LOCALHOST):$(MLFLOW_PORT)" \
+		-e MLFLOW_TRACKING_URI="$(API_LOCALHOST):$(MLFLOW_PORT)" \
 		-e ALLOW_RUNTIME_MODEL_DOWNLOAD=true \
-		-v $(MODEL_DIR):/app/data/model \
+		-v $(API_MODEL_PATH):/app/data/model \
 		$(API_IMAGE)
 endef
 
@@ -195,3 +195,27 @@ MONITORING=src.monitoring.generate_drift_reports
 
 monitoring-generate-report:
 	$(MLFLOW_ENV) $(PYTHON) -m $(MONITORING)
+
+# -------------------------------
+#  Monitoring Docker
+# -------------------------------
+
+MONITORING_IMAGE      = tutoria-mlops-monitoring:latest
+MONITORING_DOCKERFILE = docker/monitoring.Dockerfile
+
+MONITORING_LOCALHOST  = http://host.docker.internal
+MONITORING_MODEL_DIR  = $(PWD)/data/model
+
+define MONITORING_DOCKER_RUN
+	mkdir -p data/docker
+	docker run --rm \
+		-e MLFLOW_TRACKING_URI="$(MONITORING_LOCALHOST):${MLFLOW_PORT}" \
+		-v $(PWD)/data/docker:/app/data \
+		$(MONITORING_IMAGE)
+endef
+
+docker-monitoring-build:
+	docker build -f $(MONITORING_DOCKERFILE) -t $(MONITORING_IMAGE) .
+
+docker-monitoring-generate-report:
+	$(MONITORING_DOCKER_RUN)
