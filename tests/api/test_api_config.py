@@ -20,9 +20,8 @@ def _reload_config(monkeypatch, **env_overrides):
     for key in [
         "ENVIRONMENT",
         "MLFLOW_TRACKING_URI",
-        "MLFLOW_MODEL_NAME",
         "MLFLOW_MODEL_VERSION",
-        "MODEL_DIR",
+        "MODEL_PATH",
         "ALLOW_RUNTIME_MODEL_DOWNLOAD",
     ]:
         monkeypatch.delenv(key, raising=False)
@@ -81,8 +80,6 @@ def test_environment_can_be_overridden_by_env(monkeypatch):
 def test_mlflow_defaults_when_env_not_set(monkeypatch):
     cfg = _reload_config(monkeypatch)
     assert cfg.MLFLOW_TRACKING_URI == "file:./mlruns"
-    assert cfg.MLFLOW_MODEL_NAME == "sentiment-logreg-tfidf"
-    # VERSION é opcional, default None
     assert cfg.MLFLOW_MODEL_VERSION is None
 
 
@@ -90,28 +87,25 @@ def test_mlflow_env_overrides(monkeypatch):
     cfg = _reload_config(
         monkeypatch,
         MLFLOW_TRACKING_URI="http://mlflow:5000",
-        MLFLOW_MODEL_NAME="my-model",
         MLFLOW_MODEL_VERSION="7",
     )
     assert cfg.MLFLOW_TRACKING_URI == "http://mlflow:5000"
-    assert cfg.MLFLOW_MODEL_NAME == "my-model"
     assert cfg.MLFLOW_MODEL_VERSION == "7"
 
 
-def test_model_dir_respects_env_and_is_resolved(monkeypatch, tmp_path):
-    model_dir_env = tmp_path / "custom_model_dir"
-    cfg = _reload_config(monkeypatch, MODEL_DIR=str(model_dir_env))
+def test_model_path_respects_env_and_is_resolved(monkeypatch, tmp_path):
+    model_path_env = tmp_path / "custom_model_path"
+    cfg = _reload_config(monkeypatch, MODEL_PATH=str(model_path_env))
 
-    assert isinstance(cfg.MODEL_DIR, Path)
+    assert isinstance(cfg.MODEL_PATH, Path)
     # resolve() é chamado no código original
-    assert cfg.MODEL_DIR == model_dir_env.resolve()
+    assert cfg.MODEL_PATH == model_path_env.resolve()
 
 
 def test_model_dir_default_is_data_model_relative(monkeypatch):
     cfg = _reload_config(monkeypatch)
-    # Como é Path(os.getenv("MODEL_DIR", "./data/model")).resolve()
     expected = Path("./data/model").resolve()
-    assert cfg.MODEL_DIR == expected
+    assert cfg.MODEL_PATH == expected
 
 
 def test_allow_runtime_model_download_default_true_for_local(monkeypatch):

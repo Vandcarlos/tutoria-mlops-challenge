@@ -25,7 +25,7 @@ def test_router_is_included_with_prefix(monkeypatch):
     fake_router = FakeRouter()
 
     # patch the router imported in main.py
-    monkeypatch.setattr(main, "api_router", fake_router, raising=True)
+    monkeypatch.setattr(main, "router", fake_router, raising=True)
 
     # We need to reload main so that include_router() runs again
     import importlib

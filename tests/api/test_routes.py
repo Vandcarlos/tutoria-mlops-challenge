@@ -4,47 +4,49 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest
 
-from src.shared.schemas import PredictionLabel  # importa o enum usado na resposta
+from src.api.schemas import PredictRequest, PredictResponse
+from src.shared.schemas import PredictionLabel
 
 
 @pytest.fixture
 def api_client(monkeypatch):
     """
-    Build a FastAPI app with the API router, using:
-    - a fake load_model() so we don't touch MLflow or disk
-    - a fake predict_sentiment() so we control the response
-    Returns (client, called) where `called` tracks service invocation.
+    Builds a FastAPI app with the router, injecting:
+    - a fake model into app.state.model
+    - a fake logger into app.state.prediction_logger
+    - a patched predict_sentiment() so we can assert its inputs
+
+    Returns (client, called) where `called` records all parameters passed
+    to predict_sentiment().
     """
 
-    # --- 1) Patch load_model BEFORE importing routes ---
-    def fake_load_model():
-        # anything representable as "the model"
-        return "FAKE_MODEL"
-
-    monkeypatch.setattr(
-        "src.api.model_loader.load_model",
-        fake_load_model,
-        raising=True,
-    )
-
-    # Import (or reload) routes so that model = load_model() use our fake
-    import src.api.routes as routes  # noqa: F401
+    # --------------------------
+    # 1) Import and reload routes
+    # --------------------------
+    import src.api.routes as routes
 
     routes = importlib.reload(routes)
 
-    # --- 2) Patch predict_sentiment BEFORE including router in app ---
+    # --------------------------
+    # 2) Prepare tracking dict
+    # --------------------------
     called = {}
 
-    def fake_predict_sentiment(model, req):
-        # track inputs
-        called["model"] = model
+    def fake_predict_sentiment(req, model, logger):
+        """
+        Fake service storing everything that was called and returning
+        a predictable fixed response.
+        """
         called["req"] = req
+        called["model"] = model
+        called["logger"] = logger
 
-        return {
-            "label": PredictionLabel.POSITIVE,
-            "confidence": 0.99,
-        }
+        return PredictResponse(
+            prediction_label=PredictionLabel.POSITIVE,
+            confidence=0.88,
+        )
 
+    # Patch the service used by routes
     monkeypatch.setattr(
         routes,
         "predict_sentiment",
@@ -52,48 +54,57 @@ def api_client(monkeypatch):
         raising=True,
     )
 
+    # --------------------------
+    # 3) Build FastAPI app
+    # --------------------------
     app = FastAPI()
+
+    # Inject fake model + fake logger in app.state
+    app.state.model = "FAKE_MODEL"
+    app.state.prediction_logger = "FAKE_LOGGER"
+
+    # Register router
     app.include_router(routes.router, prefix="/api/v1")
 
-    client = TestClient(app)
-    return client, called
+    return TestClient(app), called
 
 
-def test_health_endpoint(api_client):
+def test_health(api_client):
     client, _ = api_client
 
     resp = client.get("/api/v1/health")
     assert resp.status_code == 200
-    data = resp.json()
-    assert data == {"status": "ok"}
+    assert resp.json() == {"status": "ok"}
 
 
-def test_predict_endpoint_calls_service_with_loaded_model(api_client):
+def test_predict(api_client):
     client, called = api_client
 
     payload = {
-        "title": "Great product",
-        "message": "I really liked it",
+        "title": "Amazing product",
+        "message": "It works perfectly",
     }
 
     resp = client.post("/api/v1/predict", json=payload)
     assert resp.status_code == 200
+
     data = resp.json()
 
-    # Confere que o serviço foi chamado com o modelo fake carregado
+    # --------------------------
+    # 1) Service was invoked properly
+    # --------------------------
     assert called["model"] == "FAKE_MODEL"
+    assert called["logger"] == "FAKE_LOGGER"
 
-    # Confere que o PredictRequest recebido é correto
     req_obj = called["req"]
+    assert isinstance(req_obj, PredictRequest)
     assert req_obj.title == payload["title"]
     assert req_obj.message == payload["message"]
 
-    # --- Resposta HTTP bate com o fake_predict_sentiment + computed_fields ---
-    # label: valor numérico do enum
-    assert data["label"] == PredictionLabel.POSITIVE.value
-    # label_name: nome do enum (derivado)
-    assert data["label_name"] == "POSITIVE"
-    # sentiment: string human-friendly (derivada)
+    # --------------------------
+    # 2) HTTP response structure (PredictResponse)
+    # --------------------------
+    assert data["prediction_label"] == PredictionLabel.POSITIVE.value
+    assert data["prediction_label_name"] == "POSITIVE"
     assert data["sentiment"] == "Positivo"
-    # confidence: igual ao fake
-    assert data["confidence"] == 0.99
+    assert data["confidence"] == 0.88
