@@ -1,0 +1,19 @@
+line-length = 88
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "B", "UP"]
+fixable = ["E", "F", "I", "B", "UP"]
+extend-select = ["RUF010"]
+
+[format]
+quote-style = "double"
+line-ending = "lf"
+
+[lint.isort]
+known-first-party = ["src"]
+combine-as-imports = true
+force-sort-within-sections = true
+
+[lint.per-file-ignores]
+"*.ipynb" = ["F821"]
