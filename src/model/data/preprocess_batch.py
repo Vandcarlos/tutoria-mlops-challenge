@@ -9,9 +9,9 @@ from src.model.data.preprocess_core import preprocess_df
 
 
 def preprocess_batch(batch_idx: int) -> Path:
-    cfg.DATASET_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    cfg.DATASET_PROCESSED_PATH.mkdir(parents=True, exist_ok=True)
 
-    raw_batch_path = cfg.DATASET_BATCH_DIR / f"train_batch_{batch_idx}.csv"
+    raw_batch_path = cfg.DATASET_BATCH_PATH / f"train_batch_{batch_idx}.csv"
 
     if not raw_batch_path.exists():
         raise FileNotFoundError(
@@ -27,7 +27,7 @@ def preprocess_batch(batch_idx: int) -> Path:
 
     df_processed = preprocess_df(df_raw=df_raw)
 
-    out = cfg.DATASET_PROCESSED_DIR / f"train_batch_{batch_idx}.parquet"
+    out = cfg.DATASET_PROCESSED_PATH / f"train_batch_{batch_idx}.parquet"
     df_processed.to_parquet(out, index=False)
 
     print(
@@ -49,7 +49,7 @@ def main():
         mlflow.log_param("batch_idx", batch_idx)
         mlflow.log_param(
             "raw_batch_input",
-            str(cfg.DATASET_BATCH_DIR / f"train_batch_{batch_idx}.csv"),
+            str(cfg.DATASET_BATCH_PATH / f"train_batch_{batch_idx}.csv"),
         )
         mlflow.log_param("processed_batch_output", str(out))
 

@@ -3,7 +3,7 @@ from src.shared.schemas import PredictionLabel
 
 
 def _build_payload(req: PredictRequest) -> list[str]:
-    payload = req.title or "" + req.message or ""
+    payload = req.title + req.message
 
     return [payload]
 
@@ -24,7 +24,6 @@ def predict_sentiment(model, req: PredictRequest) -> PredictResponse:
     print("direct prediction", model.predict(payload)[0])
 
     return PredictResponse(
-        label_id=prediction,
         label=label,
         confidence=confidence,
     )
