@@ -181,3 +181,17 @@ docker-api-build:
 
 docker-api-run:
 	$(API_DOCKER_RUN)
+
+
+# -------------------------------
+#  Monitoring commands
+# -------------------------------
+
+MONITORING=src.monitoring.generate_drift_reports
+
+# -------------------------------
+#  Monitoring local commands
+# -------------------------------
+
+monitoring-generate-report:
+	$(MLFLOW_ENV) $(PYTHON) -m $(MONITORING)
