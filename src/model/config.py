@@ -6,26 +6,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Environments
 DATASET_LOCAL_PATH = Path(os.getenv("DATASET_LOCAL_PATH", "./data"))
 DATASET_RAW_DIR = DATASET_LOCAL_PATH / "raw"
 DATASET_PROCESSED_DIR = DATASET_LOCAL_PATH / "processed"
 DATASET_BATCH_DIR = DATASET_LOCAL_PATH / "batches"
 DATASET_SPLIT_COUNT = int(os.getenv("DATASET_SPLIT_COUNT", "10"))
-DATASET_POLARITY_COLUMN = os.getenv("DATASET_POLARITY_COLUMN", "polarity")
-DATASET_TITLE_COLUMN = os.getenv("DATASET_TITLE_COLUMN", "title")
-DATASET_MESSAGE_COLUMN = os.getenv("DATASET_MESSAGE_COLUMN", "message")
-DATASET_CLEAR_COLUMNS = [
-    DATASET_POLARITY_COLUMN,
-    DATASET_TITLE_COLUMN,
-    DATASET_MESSAGE_COLUMN,
-]
-DATASET_FULL_TEXT_COLUMN = os.getenv("DATASET_FULL_TEXT_COLUMN", "full_text")
 
 KAGGLE_DATASET_NAME = os.getenv("DATASET_KAGGLE_NAME", "kritanjalijain/amazon-reviews")
 KAGGLE_DATASET_TRAIN_FILENAME = os.getenv("DATASET_TRAIN", "train.csv")
 KAGGLE_DATASET_TEST_FILENAME = os.getenv("DATASET_TEST", "test.csv")
 
-MODEL_NAME = "sentiment-logreg-tfidf"
+MLFLOW_MODEL_NAME: str = os.getenv("MLFLOW_MODEL_NAME", "sentiment-logreg-tfidf")
+
+# Constants
+
+KAGGLE_DATASET_NAME = "kritanjalijain/amazon-reviews"
+KAGGLE_DATASET_TRAIN_FILENAME = "train.csv"
+KAGGLE_DATASET_TEST_FILENAME = "test.csv"
+
+DATASET_POLARITY_COLUMN = "polarity"
+DATASET_TITLE_COLUMN = "title"
+DATASET_MESSAGE_COLUMN = "message"
+DATASET_FULL_TEXT_COLUMN = "full_text"
 
 
 @dataclass

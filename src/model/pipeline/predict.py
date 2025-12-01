@@ -1,42 +1,75 @@
 import argparse
 import json
 import sys
+from typing import Any
+
+import pandas as pd
 
 import mlflow
-from src import config as cfg
-from src.model.data.preprocess_input import preprocess_input
-from src.model.pipeline.model_resolver import resolve_model_uri
+from src.model.data.preprocess_core import preprocess_df
+from src.shared.model_resolver import resolve_model_uri
+from src.shared.schemas import PredictionLabel
+
+DATASET_TITLE_COLUMN = "title"
+DATASET_MESSAGE_COLUMN = "message"
 
 
-def predict(model_version: str | None, title: str | None, message: str | None) -> dict:
+def _preprocess_input(title: str | None, message: str | None) -> pd.DataFrame:
+    title = title or ""
+    message = message or ""
+
+    if title.strip() == "" and message.strip() == "":
+        raise ValueError("Both title and message cannot be empty.")
+
+    df = pd.DataFrame(
+        [
+            {
+                DATASET_TITLE_COLUMN: title,
+                DATASET_MESSAGE_COLUMN: message,
+            }
+        ]
+    )
+
+    df = preprocess_df(df)
+    return df
+
+
+def predict(
+    model_version: str | None,
+    title: str | None,
+    message: str | None,
+) -> dict[str:Any]:
     """
     Preprocess the input and execute prediction using the MLflow model.
     """
-    df = preprocess_input(title=title, message=message)
+    # Prediction
+    model_input = {"title": title, "message": message}
 
     model_uri = resolve_model_uri(model_version)
+    model = mlflow.pyfunc.load_model(model_uri)
 
-    model = mlflow.sklearn.load_model(model_uri)
+    pred_obj = model.predict(model_input)[0]
 
-    X = df[cfg.DATASET_FULL_TEXT_COLUMN].values
-    pred = int(model.predict(X)[0])
+    # Prediction parse
+    prediction_label = PredictionLabel(pred_obj.label_id)
 
-    if pred == 1:
-        label = "negative"
-    elif pred == 2:
-        label = "positive"
-    else:
-        label = f"unknown({pred})"
+    # Input processing
+    df_preprocessed = _preprocess_input(title=title, message=message)
+    preprocessed_record = df_preprocessed.to_dict(orient="records")[0]
 
     result = {
         "input": {
             "title": title,
             "message": message,
         },
-        "preprocessed": df.to_dict(orient="records")[0],
+        "preprocessed": preprocessed_record,
         "model_uri": model_uri,
-        "prediction": pred,
-        "label": label,
+        "prediction": {
+            "label": prediction_label.name,
+            "label_id": pred_obj.label_id,
+            "sentiment": prediction_label.sentiment,
+            "confidence": pred_obj.confidence,
+        },
     }
 
     return result

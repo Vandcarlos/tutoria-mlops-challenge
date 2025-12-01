@@ -43,7 +43,6 @@ INGEST=src.model.data.ingest
 SPLIT_BATCHES=src.model.data.split_batches
 PREPROCESS_BATCH=src.model.data.preprocess_batch $(batch)
 TRAIN=src.model.pipeline.train --batches $(batches)
-PREPROCESS_TEST=src.model.data.preprocess_test
 EVALUATE=src.model.pipeline.evaluate --model_version "$(model_version)"
 PREDICT=src.model.pipeline.predict --title "$(title)" --message "$(message)" --model_version "$(model_version)"
 
@@ -63,9 +62,6 @@ model-preprocess-batch:
 model-train:
 	$(MLFLOW_ENV) $(PYTHON) -m $(TRAIN)
 
-model-preprocess-test:
-	$(MLFLOW_ENV) $(PYTHON) -m $(PREPROCESS_TEST)
-
 model-evaluate:
 	$(MLFLOW_ENV) $(PYTHON) -m $(EVALUATE)
 
@@ -82,7 +78,6 @@ model-pipeline-train: batches=$(batch)
 model-pipeline-train:
 	$(MLFLOW_ENV) $(PYTHON) -m $(PREPROCESS_BATCH)
 	$(MLFLOW_ENV) $(PYTHON) -m $(TRAIN)
-	$(MLFLOW_ENV) $(PYTHON) -m $(PREPROCESS_TEST)
 	$(MLFLOW_ENV) $(PYTHON) -m $(EVALUATE)
 	@echo "Pipeline [TRAIN] completa finalizada com sucesso para batch=$(batch)."
 
@@ -90,7 +85,7 @@ model-predict:
 	$(MLFLOW_ENV) $(PYTHON) -m $(PREDICT)
 
 # -------------------------------
-#  Docker: imagem do MODEL
+#  Model Docker
 # -------------------------------
 
 MODEL_IMAGE      = tutoria-mlops-model:latest
@@ -99,7 +94,7 @@ MODEL_LOCALHOST  = http://host.docker.internal
 
 MLFLOW_EXP_NAME  = amazon-reviews-training
 
-define DOCKER_RUN
+define MODEL_DOCKER_RUN
 	mkdir -p data/docker
 	docker run --rm \
 		-e MLFLOW_TRACKING_URI="$(MODEL_LOCALHOST):${MLFLOW_PORT}" \
@@ -112,35 +107,77 @@ docker-model-build:
 	docker build -f $(MODEL_DOCKERFILE) -t $(MODEL_IMAGE) .
 
 docker-model-ingest:
-	$(DOCKER_RUN) $(INGEST)
+	$(MODEL_DOCKER_RUN) $(INGEST)
 
 docker-model-split-batches:
-	$(DOCKER_RUN) $(SPLIT_BATCHES)
+	$(MODEL_DOCKER_RUN) $(SPLIT_BATCHES)
 
 docker-model-preprocess-batch:
-	$(DOCKER_RUN) $(PREPROCESS_BATCH)
+	$(MODEL_DOCKER_RUN) $(PREPROCESS_BATCH)
 
 docker-model-train:
-	$(DOCKER_RUN) $(TRAIN)
-
-docker-model-preprocess-test:
-	$(DOCKER_RUN) $(PREPROCESS_TEST)
+	$(MODEL_DOCKER_RUN) $(TRAIN)
 
 docker-model-evaluate:
-	$(DOCKER_RUN) $(EVALUATE)
+	$(MODEL_DOCKER_RUN) $(EVALUATE)
 
 docker-model-pipeline-ingest:
-	$(DOCKER_RUN) $(INGEST)
-	$(DOCKER_RUN) $(SPLIT_BATCHES)
+	$(MODEL_DOCKER_RUN) $(INGEST)
+	$(MODEL_DOCKER_RUN) $(SPLIT_BATCHES)
 	@echo "Pipeline [Ingest] (Docker) completa finalizada com sucesso."
 
 docker-model-pipeline-train: batches=$(batch)
 docker-model-pipeline-train:
-	$(DOCKER_RUN) $(PREPROCESS_BATCH)
-	$(DOCKER_RUN) $(TRAIN)
-	$(DOCKER_RUN) $(PREPROCESS_TEST)
-	$(DOCKER_RUN) $(EVALUATE)
+	$(MODEL_DOCKER_RUN) $(PREPROCESS_BATCH)
+	$(MODEL_DOCKER_RUN) $(TRAIN)
+	$(MODEL_DOCKER_RUN) $(EVALUATE)
 	@echo "Pipeline [Ingest] (Docker) completa finalizada com sucesso para batch=$(batch)."
 
 docker-model-predict:
-	$(DOCKER_RUN) $(PREDICT)
+	$(MODEL_DOCKER_RUN) $(PREDICT)
+
+
+# -------------------------------
+#  API commands
+# -------------------------------
+
+RUN_API=uvicorn src.api.main:app
+
+# -------------------------------
+#  API local commands
+# -------------------------------
+
+api-run:
+	$(MLFLOW_ENV) $(PYTHON) -m $(RUN_API)
+
+api-predict:
+	@curl -X POST "http://localhost:8000/api/v1/predict" \
+		-H "Content-Type: application/json" \
+		-d '{"title":"$(title)","message":"$(message)"}'
+
+# -------------------------------
+#  API Docker
+# -------------------------------
+
+API_IMAGE      = tutoria-mlops-api:latest
+API_DOCKERFILE = docker/api.Dockerfile
+API_PORT       = 8010
+
+MODEL_DIR      = $(PWD)/data/model
+MODEL_LOCALHOST = http://host.docker.internal
+
+define API_DOCKER_RUN
+	mkdir -p $(MODEL_DIR)
+	docker run --rm \
+		-p $(API_PORT):8000 \
+		-e MLFLOW_TRACKING_URI="$(MODEL_LOCALHOST):$(MLFLOW_PORT)" \
+		-e ALLOW_RUNTIME_MODEL_DOWNLOAD=true \
+		-v $(MODEL_DIR):/app/data/model \
+		$(API_IMAGE)
+endef
+
+docker-api-build:
+	docker build -f $(API_DOCKERFILE) -t $(API_IMAGE) .
+
+docker-api-run:
+	$(API_DOCKER_RUN)

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+import numpy as np
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 
 import mlflow
@@ -12,16 +13,32 @@ class ValidationResult:
 
 
 def validate(
-    estimator_pipeline,
-    X_data,
-    y_data,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
     split_name: str = "val",
     log_report: bool = False,
 ) -> ValidationResult:
-    y_pred = estimator_pipeline.predict(X_data)
+    """
+    Compute and optionally log classification metrics.
 
-    acc = accuracy_score(y_data, y_pred)
-    f1 = f1_score(y_data, y_pred, average="macro")
+    Parameters
+    ----------
+    y_true :
+        Ground-truth labels (array-like).
+    y_pred :
+        Predicted labels (array-like).
+    split_name : str
+        Name of the data split ("train", "val", "test", etc.).
+    log_mlflow : bool, default True
+        Whether to log metrics to MLflow.
+
+    Returns
+    -------
+    ValidationResult:
+        Class with the computed metrics.
+    """
+    acc = accuracy_score(y_pred, y_true)
+    f1 = f1_score(y_pred, y_true, average="macro")
 
     mlflow.log_metric(f"{split_name}_accuracy", acc)
     mlflow.log_metric(f"{split_name}_f1_macro", f1)
@@ -29,7 +46,7 @@ def validate(
     print(f"[{split_name}] Accuracy:", acc)
     print(f"[{split_name}] F1 macro:", f1)
 
-    report = classification_report(y_data, y_pred)
+    report = classification_report(y_pred, y_true)
     print(report)
 
     if log_report:

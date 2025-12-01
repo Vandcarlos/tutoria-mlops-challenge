@@ -1,0 +1,4 @@
+mlflow==2.21.0
+fastapi
+uvicorn[standard]
+python-dotenv==1.2.1

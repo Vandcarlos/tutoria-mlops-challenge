@@ -73,7 +73,7 @@ class TrainValValues:
     X_train: list[str]
     y_train: list[int]
     X_val: list[str]
-    y_val: list[str]
+    y_val: list[int]
 
 
 def _split_train_val(df: pd.DataFrame) -> TrainValValues:
@@ -145,7 +145,7 @@ def train(batches: list[int]):
         mlflow.sklearn.log_model(
             sk_model=pipeline,
             artifact_path="model",
-            registered_model_name=cfg.MODEL_NAME,
+            registered_model_name=cfg.MLFLOW_MODEL_NAME,
         )
 
         mlflow.set_tag("rows_train_total", len(df))
@@ -155,15 +155,16 @@ def train(batches: list[int]):
 
         _generate_tags(batches=batches, version=version)
 
+        y_pred_val = pipeline.predict(trainValValues.X_val)
+
         val_result = validate(
-            estimator_pipeline=pipeline,
-            X_data=trainValValues.X_val,
-            y_data=trainValValues.y_val,
+            y_true=trainValValues.y_val,
+            y_pred=y_pred_val,
         )
 
         print("[TRAIN] Validation result:", val_result)
 
-        model_uri = f"models:/{cfg.MODEL_NAME}/{version.version}"
+        model_uri = f"models:/{cfg.MLFLOW_MODEL_NAME}/{version.version}"
         print(f"[TRAIN] Model URI: {model_uri}")
         return model_uri
 
