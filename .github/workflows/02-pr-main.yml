@@ -27,8 +27,8 @@ jobs:
     secrets:
       inherit
 
-  terraform-plan-prod:
-    uses: ./.github/workflows/_reusable-terraform-plan.yml
+  terraform-plan:
+    uses: ./.github/workflows/_reusable-terraform.yml
     with:
       working-directory: infra/envs/prod
     secrets:
