@@ -9,8 +9,11 @@ load_dotenv()
 # Environments
 DATASET_LOCAL_PATH = Path(os.getenv("DATASET_LOCAL_PATH", "./data"))
 DATASET_RAW_PATH = DATASET_LOCAL_PATH / "raw"
-DATASET_PROCESSED_PATH = DATASET_LOCAL_PATH / "processed"
+DATASET_RAW_TRAIN_PARQUET = DATASET_RAW_PATH / "train.parquet"
+DATASET_RAW_TEST_PARQUET = DATASET_RAW_PATH / "test.parquet"
 DATASET_BATCH_PATH = DATASET_LOCAL_PATH / "batches"
+DATASET_PROCESSED_PATH = DATASET_LOCAL_PATH / "processed"
+DATASET_PROCESSED_TEST_PATH = DATASET_PROCESSED_PATH / "test.parquet"
 DATASET_SPLIT_COUNT = int(os.getenv("DATASET_SPLIT_COUNT", "10"))
 
 MLFLOW_MODEL_NAME: str = os.getenv("MLFLOW_MODEL_NAME", "sentiment-logreg-tfidf")
@@ -51,3 +54,11 @@ class TrainValSplit:
 TFIDF_PARAMS = TfidfParams()
 CLF_PARAMS = ClfParams()
 TRAIN_VAL_SPLIT = TrainValSplit()
+
+
+def DATASET_BATCH_ITEM_PATH(batch_idx: int) -> Path:
+    return DATASET_BATCH_PATH / f"train_batch_{batch_idx}.parquet"
+
+
+def DATASET_PROCESSED_BATCH_ITEM_PATH(batch_idx: int) -> Path:
+    return DATASET_PROCESSED_PATH / f"train_batch_{batch_idx}.parquet"

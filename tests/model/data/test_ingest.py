@@ -1,209 +1,184 @@
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 
-def _setup_fake_kaggle_dir(tmp_path, ingest_module) -> Path:
+def _setup_fake_csvs(tmp_path, ingest_module):
     """
-    Create a fake Kaggle download directory with train/test files
-    matching the filenames expected by the config used in ingest.
+    Create a fake Kaggle download directory containing the expected
+    train/test CSV files.
     """
     dataset_dir = tmp_path / "kaggle_download"
     dataset_dir.mkdir()
 
-    train_name = ingest_module.cfg.KAGGLE_DATASET_TRAIN_FILENAME
-    test_name = ingest_module.cfg.KAGGLE_DATASET_TEST_FILENAME
+    train_name = ingest_module.KAGGLE_DATASET_TRAIN_FILENAME
+    test_name = ingest_module.KAGGLE_DATASET_TEST_FILENAME
 
-    (dataset_dir / train_name).write_text("train-data")
-    (dataset_dir / test_name).write_text("test-data")
+    (dataset_dir / train_name).write_text("col\n1\n2\n3\n")
+    (dataset_dir / test_name).write_text("col\n7\n8\n9\n")
 
     return dataset_dir
 
 
-def test_ingest_happy_path_copies_files_to_raw_dir(tmp_path, monkeypatch):
+def test_ingest_happy_path(tmp_path, monkeypatch):
     """
     ingest() must:
     - create DATASET_RAW_PATH
-    - copy train/test from Kaggle download dir
-    - return the destination paths
+    - read CSV files from Kaggle download dir
+    - save them as Parquet in RAW directory
+    - return proper output dict with row counts and paths
     """
     from src.model.data import ingest as ingest_module
 
-    # Redireciona o RAW para um tmp de teste
+    # Override RAW path
     raw_dir = tmp_path / "raw"
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
+    monkeypatch.setattr(ingest_module, "DATASET_RAW_PATH", raw_dir)
 
-    # Cria um diretório fake como se fosse o download do Kaggle
-    dataset_dir = _setup_fake_kaggle_dir(tmp_path, ingest_module)
+    # Override parquet output paths
+    train_parquet = raw_dir / "train.parquet"
+    test_parquet = raw_dir / "test.parquet"
 
-    # Mock do kagglehub.dataset_download para apontar pro nosso diretório fake
-    def fake_dataset_download(dataset_name: str) -> str:
+    monkeypatch.setattr(ingest_module, "DATASET_RAW_TRAIN_PARQUET", train_parquet)
+    monkeypatch.setattr(ingest_module, "DATASET_RAW_TEST_PARQUET", test_parquet)
+
+    # Create fake kaggle download
+    dataset_dir = _setup_fake_csvs(tmp_path, ingest_module)
+
+    # Mock kagglehub
+    def fake_download(name):
         return str(dataset_dir)
 
-    fake_kagglehub = SimpleNamespace(dataset_download=fake_dataset_download)
-    monkeypatch.setattr(ingest_module, "kagglehub", fake_kagglehub)
+    monkeypatch.setattr(
+        ingest_module, "kagglehub", SimpleNamespace(dataset_download=fake_download)
+    )
 
-    # Executa
+    # Execute
     result = ingest_module.ingest()
 
-    train_name = ingest_module.cfg.KAGGLE_DATASET_TRAIN_FILENAME
-    test_name = ingest_module.cfg.KAGGLE_DATASET_TEST_FILENAME
-
-    expected_train = raw_dir / train_name
-    expected_test = raw_dir / test_name
-
-    # Verifica paths retornados
-    assert result["train"] == expected_train
-    assert result["test"] == expected_test
-
-    # Verifica que os arquivos foram copiados
-    assert expected_train.read_text() == "train-data"
-    assert expected_test.read_text() == "test-data"
-
-    # Verifica que o diretório foi criado
-    assert expected_train.parent == raw_dir
+    # Validate directories
     assert raw_dir.exists()
 
+    # Validate parquet files created
+    assert train_parquet.exists()
+    assert test_parquet.exists()
 
-def test_ingest_raises_if_train_missing(tmp_path, monkeypatch):
-    """
-    Se o arquivo de train não existir no diretório baixado,
-    ingest() deve levantar FileNotFoundError.
-    """
+    # Validate returned dict
+    assert result["train_path"] == train_parquet
+    assert result["test_path"] == test_parquet
+    assert result["train_rows"] == 3
+    assert result["test_rows"] == 3
+
+
+def test_ingest_missing_train(tmp_path, monkeypatch):
+    """ingest() must raise FileNotFoundError if train CSV is missing."""
     from src.model.data import ingest as ingest_module
 
     raw_dir = tmp_path / "raw"
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
+    monkeypatch.setattr(ingest_module, "DATASET_RAW_PATH", raw_dir)
+
+    # Fake kaggle dir
+    dataset_dir = tmp_path / "kaggle_download"
+    dataset_dir.mkdir()
+
+    # Create only test file
+    test_path = dataset_dir / ingest_module.KAGGLE_DATASET_TEST_FILENAME
+    test_path.write_text("x")
+
+    def fake_download(name):
+        return str(dataset_dir)
+
+    monkeypatch.setattr(
+        ingest_module, "kagglehub", SimpleNamespace(dataset_download=fake_download)
+    )
+
+    with pytest.raises(FileNotFoundError):
+        ingest_module.ingest()
+
+
+def test_ingest_missing_test(tmp_path, monkeypatch):
+    """ingest() must raise FileNotFoundError if test CSV is missing."""
+    from src.model.data import ingest as ingest_module
+
+    raw_dir = tmp_path / "raw"
+    monkeypatch.setattr(ingest_module, "DATASET_RAW_PATH", raw_dir)
 
     dataset_dir = tmp_path / "kaggle_download"
     dataset_dir.mkdir()
 
-    # Só cria o test, falta o train
-    test_name = ingest_module.cfg.KAGGLE_DATASET_TEST_FILENAME
-    (dataset_dir / test_name).write_text("test-data")
+    train_path = dataset_dir / ingest_module.KAGGLE_DATASET_TRAIN_FILENAME
+    train_path.write_text("x")
 
-    def fake_dataset_download(dataset_name: str) -> str:
+    def fake_download(name):
         return str(dataset_dir)
 
-    fake_kagglehub = SimpleNamespace(dataset_download=fake_dataset_download)
-    monkeypatch.setattr(ingest_module, "kagglehub", fake_kagglehub)
+    monkeypatch.setattr(
+        ingest_module, "kagglehub", SimpleNamespace(dataset_download=fake_download)
+    )
 
-    with pytest.raises(FileNotFoundError) as exc:
+    with pytest.raises(FileNotFoundError):
         ingest_module.ingest()
 
-    assert "Train file not found" in str(exc.value)
 
-
-def test_ingest_raises_if_test_missing(tmp_path, monkeypatch):
-    """
-    Se o arquivo de test não existir no diretório baixado,
-    ingest() deve levantar FileNotFoundError.
-    """
-    from src.model.data import ingest as ingest_module
-
-    raw_dir = tmp_path / "raw"
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
-
-    dataset_dir = tmp_path / "kaggle_download"
-    dataset_dir.mkdir()
-
-    # Só cria o train, falta o test
-    train_name = ingest_module.cfg.KAGGLE_DATASET_TRAIN_FILENAME
-    (dataset_dir / train_name).write_text("train-data")
-
-    def fake_dataset_download(dataset_name: str) -> str:
-        return str(dataset_dir)
-
-    fake_kagglehub = SimpleNamespace(dataset_download=fake_dataset_download)
-    monkeypatch.setattr(ingest_module, "kagglehub", fake_kagglehub)
-
-    with pytest.raises(FileNotFoundError) as exc:
-        ingest_module.ingest()
-
-    assert "Test file not found" in str(exc.value)
-
-
-# ... (seus outros testes do ingest ficam aqui em cima) ...
-
-
-def test_ingest_main_logs_to_mlflow(tmp_path, monkeypatch):
+def test_ingest_main_logs_mlflow(tmp_path, monkeypatch):
     """
     main() must:
-    - start an MLflow run with the expected run_name;
-    - call ingest();
-    - log dataset_name, train_path and test_path as params;
-    - log the train/test files as artifacts.
+    - start an MLflow run
+    - call ingest()
+    - log dataset_name and all returned params
     """
     from src.model.data import ingest as ingest_module
 
-    # --- Configura paths fake para o cfg usado dentro de ingest.py ---
+    # Fake raw folder
     raw_dir = tmp_path / "raw"
     raw_dir.mkdir()
 
-    monkeypatch.setattr(ingest_module.cfg, "KAGGLE_DATASET_NAME", "fake/dataset")
-    monkeypatch.setattr(ingest_module.cfg, "DATASET_RAW_PATH", raw_dir)
-    monkeypatch.setattr(ingest_module.cfg, "KAGGLE_DATASET_TRAIN_FILENAME", "train.csv")
-    monkeypatch.setattr(ingest_module.cfg, "KAGGLE_DATASET_TEST_FILENAME", "test.csv")
+    monkeypatch.setattr(ingest_module, "DATASET_RAW_PATH", raw_dir)
+    monkeypatch.setattr(ingest_module, "KAGGLE_DATASET_NAME", "fake/dataset")
 
-    # Paths que o fake ingest vai retornar
-    train_path = raw_dir / "train.csv"
-    test_path = raw_dir / "test.csv"
-    train_path.write_text("train-data")
-    test_path.write_text("test-data")
-
-    # --- Mock do ingest() para não chamar Kaggle nem copiar nada ---
-    def fake_ingest():
-        return {"train": train_path, "test": test_path}
-
-    monkeypatch.setattr(ingest_module, "ingest", fake_ingest)
-
-    # --- Mock do mlflow (start_run, log_param, log_artifact) ---
-    calls = {
-        "start_run": [],
-        "log_param": [],
-        "log_artifact": [],
+    # Fake ingest() return
+    output = {
+        "train_path": raw_dir / "train.parquet",
+        "test_path": raw_dir / "test.parquet",
+        "train_rows": 10,
+        "test_rows": 5,
     }
+
+    monkeypatch.setattr(ingest_module, "ingest", lambda: output)
+
+    # Track MLflow calls
+    calls = {"start_run": [], "log_param": []}
 
     class DummyRun:
         def __enter__(self):
             return self
 
-        def __exit__(self, exc_type, exc, tb):
-            return False  # não suprime exceções
+        def __exit__(self, *args):
+            return False
 
     def fake_start_run(run_name):
-        calls["start_run"].append({"run_name": run_name})
+        calls["start_run"].append(run_name)
         return DummyRun()
 
-    def fake_log_param(key, value):
-        calls["log_param"].append((key, value))
+    def fake_log_param(key, val):
+        calls["log_param"].append((key, val))
 
-    def fake_log_artifact(path):
-        calls["log_artifact"].append(Path(path))
-
-    fake_mlflow = SimpleNamespace(
-        start_run=fake_start_run,
-        log_param=fake_log_param,
-        log_artifact=fake_log_artifact,
+    monkeypatch.setattr(
+        ingest_module,
+        "mlflow",
+        SimpleNamespace(
+            start_run=fake_start_run,
+            log_param=fake_log_param,
+        ),
     )
 
-    monkeypatch.setattr(ingest_module, "mlflow", fake_mlflow)
-
-    # --- Executa o main() ---
+    # Execute main()
     ingest_module.main()
 
-    # --- Asserts ---
+    assert calls["start_run"] == ["data_ingest"]
 
-    # 1) start_run chamado corretamente
-    assert calls["start_run"] == [{"run_name": "data_ingest"}]
-
-    # 2) log_param: dataset_name, train_path, test_path
-    logged_params = dict(calls["log_param"])
-    assert logged_params["dataset_name"] == "fake/dataset"
-    assert logged_params["train_path"] == raw_dir / "train.csv"
-    assert logged_params["test_path"] == raw_dir / "test.csv"
-
-    # 3) log_artifact: paths retornados por ingest()
-    assert train_path in calls["log_artifact"]
-    assert test_path in calls["log_artifact"]
+    logged = dict(calls["log_param"])
+    assert logged["dataset_name"] == "fake/dataset"
+    assert logged["train_path"] == str(output["train_path"])
+    assert logged["test_path"] == str(output["test_path"])
+    assert logged["train_rows"] == "10"
+    assert logged["test_rows"] == "5"

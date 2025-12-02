@@ -2,13 +2,9 @@ import importlib
 from pathlib import Path
 
 ENV_VARS = [
-    "MONITORING_BASE_PATH",
-    "MONITORING_OUTPUT_PATH",
-    "MONITORING_REPORT_PATH",
-    "MONITORING_LOOKBACK_DAYS",
-    "REFERENCE_PREDICTIONS_PATH",
+    "BASE_PATHMONITORING_LOOKBACK_DAYS",
+    "ALLOW_RUNTIME_MODEL_DOWNLOAD",
     "TEST_DATA_PATH",
-    "TEST_FULL_TEXT_COLUMN",
     "MODEL_PATH",
 ]
 
@@ -31,12 +27,15 @@ def test_config_uses_default_values_when_env_not_set(monkeypatch):
 
     cfg = importlib.reload(cfg)
 
+    expected_base_path = Path("./data/monitoring").resolve()
+    assert cfg.BASE_PATH == expected_base_path
+    assert cfg.MONITORING_BASE_PATH == expected_base_path / "predictions"
+    assert cfg.MONITORING_OUTPUT_PATH == expected_base_path / "reports"
+
     # Defaults from the implementation
-    assert cfg.MONITORING_BASE_PATH == Path("./data/monitoring/predictions").resolve()
-    assert cfg.MONITORING_OUTPUT_PATH == Path("./data/monitoring/reports").resolve()
     assert (
         cfg.MONITORING_REPORT_PATH
-        == cfg.MONITORING_OUTPUT_PATH / "prediction_drift_report.html"
+        == expected_base_path / "reports/prediction_drift_report.html"
     )
 
     # LOOKBACK default
@@ -45,12 +44,10 @@ def test_config_uses_default_values_when_env_not_set(monkeypatch):
 
     assert (
         cfg.REFERENCE_PREDICTIONS_PATH
-        == Path("./data/monitoring/reference_predictions.parquet").resolve()
+        == expected_base_path / "reference_predictions.parquet"
     )
 
-    assert (
-        cfg.TEST_DATA_PATH == Path("./data/processed/test_processed.parquet").resolve()
-    )
+    assert cfg.TEST_DATA_PATH == Path("./data/processed/test.parquet").resolve()
     assert cfg.TEST_FULL_TEXT_COLUMN == "full_text"
 
     assert cfg.MODEL_PATH == Path("./data/model").resolve()
@@ -65,17 +62,12 @@ def test_config_reads_values_from_environment(monkeypatch, tmp_path):
 
     # Create custom paths under tmp_path
     base_path = tmp_path / "custom_predictions"
-    out_path = tmp_path / "custom_reports"
-    ref_path = tmp_path / "ref.parquet"
     test_data_path = tmp_path / "test_proc.parquet"
     model_path = tmp_path / "custom_model"
 
     # Note: we don't need the files to exist; config only resolves paths.
-    monkeypatch.setenv("MONITORING_BASE_PATH", str(base_path))
-    monkeypatch.setenv("MONITORING_OUTPUT_PATH", str(out_path))
-    # REPORT_PATH is derived from MONITORING_OUTPUT_PATH, so we don't set it directly
+    monkeypatch.setenv("BASE_PATH", str(base_path))
     monkeypatch.setenv("MONITORING_LOOKBACK_DAYS", "30")
-    monkeypatch.setenv("REFERENCE_PREDICTIONS_PATH", str(ref_path))
     monkeypatch.setenv("TEST_DATA_PATH", str(test_data_path))
     monkeypatch.setenv("MODEL_PATH", str(model_path))
 
@@ -83,18 +75,9 @@ def test_config_reads_values_from_environment(monkeypatch, tmp_path):
 
     cfg = importlib.reload(cfg)
 
-    assert cfg.MONITORING_BASE_PATH == base_path.resolve()
-    assert cfg.MONITORING_OUTPUT_PATH == out_path.resolve()
-    assert (
-        cfg.MONITORING_REPORT_PATH
-        == out_path.resolve() / "prediction_drift_report.html"
-    )
-
+    assert cfg.BASE_PATH == base_path.resolve()
     assert cfg.MONITORING_LOOKBACK_DAYS == 30
     assert isinstance(cfg.MONITORING_LOOKBACK_DAYS, int)
 
-    assert cfg.REFERENCE_PREDICTIONS_PATH == ref_path.resolve()
     assert cfg.TEST_DATA_PATH == test_data_path.resolve()
-    assert cfg.TEST_FULL_TEXT_COLUMN == "full_text"
-
     assert cfg.MODEL_PATH == model_path.resolve()

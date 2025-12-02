@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import sys
 
@@ -6,8 +5,6 @@ from mlflow.tracking import MlflowClient
 from sklearn.pipeline import Pipeline
 
 import mlflow
-
-MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")
 
 MODEL_NAME = "sentiment-logreg-tfidf"
 DEFAIULT_STAGE = "Production"
@@ -70,8 +67,6 @@ def load_model(
     version: str | None = None,
     allow_runtime_model_download: bool = False,
 ) -> Pipeline:
-    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-
     if model_local_path.exists() and any(model_local_path.iterdir()):
         return _load_model_from_local_path(model_local_path=model_local_path)
 

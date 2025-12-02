@@ -113,14 +113,12 @@ def test_generate_reference_predictions_writes_parquet(monkeypatch, tmp_path):
 
     fake_model = FakeModel()
 
-    def fake_load_model(model_local_path):
-        # Ensure it receives the patched MODEL_PATH
+    def fake_load_model(model_local_path, allow_runtime_model_download):
         assert model_local_path == model_path
         return fake_model
 
     monkeypatch.setattr(grp, "load_model", fake_load_model, raising=True)
 
-    # 4) Fake infer_predictions_with_confidence
     def fake_infer_predictions_with_confidence(model, texts):
         assert model is fake_model
         assert list(texts) == df_val["full_text"].tolist()

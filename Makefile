@@ -3,6 +3,10 @@ PYTHON=python3
 MLFLOW_PORT=5500
 MLFLOW_URI=http://localhost:$(MLFLOW_PORT)
 
+# -------------------------------
+#  Infrastructure (MLflow)
+# -------------------------------
+
 define ML_IS_UP
 	$(shell curl -s $(MLFLOW_URI)/api/2.0/mlflow/experiments/list >/dev/null 2>&1 && echo "up")
 endef
@@ -13,10 +17,6 @@ else
 	MLFLOW_ENV=
 endif
 
-# -------------------------------
-#  Infrastructure (MLflow)
-# -------------------------------
-
 mlflow-up:
 	docker compose -f mlflow/docker-compose.yml up -d
 
@@ -25,6 +25,16 @@ mlflow-down:
 
 mlflow-status:
 	@echo "MLflow status: $(call ML_IS_UP)"
+
+# -------------------------------
+#  Infrastructure (Airflow)
+# -------------------------------
+
+airflow-up:
+	docker compose -f airflow/docker-compose.yml up -d
+
+airflow-down:
+	docker compose -f airflow/docker-compose.yml down
 
 # -------------------------------
 #  Notebooks
@@ -41,10 +51,10 @@ fix-notebooks:
 
 INGEST=src.model.data.ingest
 SPLIT_BATCHES=src.model.data.split_batches
-PREPROCESS_BATCH=src.model.data.preprocess_batch $(batch)
+PREPROCESS_BATCH=src.model.pipeline.preprocess_batch $(batch)
 TRAIN=src.model.pipeline.train --batches $(batches)
 EVALUATE=src.model.pipeline.evaluate --model_version "$(model_version)"
-PREDICT=src.model.pipeline.predict --title "$(title)" --message "$(message)" --model_version "$(model_version)"
+PREDICT=src.model.utilities.predict --title "$(title)" --message "$(message)" --model_version "$(model_version)"
 
 # -------------------------------
 #  Model local commands
