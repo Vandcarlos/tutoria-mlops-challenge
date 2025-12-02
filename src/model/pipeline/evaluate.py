@@ -3,24 +3,46 @@ import argparse
 import pandas as pd
 
 import mlflow
-from src.model import config as cfg
-from src.model.data.preprocess_core import preprocess_df
-from src.model.pipeline.metrics_helper import validate
+from src.model.config import (
+    DATASET_FULL_TEXT_COLUMN,
+    DATASET_MESSAGE_COLUMN,
+    DATASET_POLARITY_COLUMN,
+    DATASET_PROCESSED_PATH,
+    DATASET_PROCESSED_TEST_PATH,
+    DATASET_RAW_TEST_PARQUET,
+    DATASET_TITLE_COLUMN,
+)
+from src.model.utilities.metrics_helper import validate
+from src.model.utilities.preprocess_core import preprocess_df
 from src.shared.model_resolver import resolve_model_uri
 
 
 def _load_test_dataset() -> pd.DataFrame:
-    test_path = cfg.DATASET_RAW_PATH / "test.csv"
-    df_test = pd.read_csv(test_path, header=None)
+    df_test = pd.read_parquet(DATASET_RAW_TEST_PARQUET)
     df_test.columns = [
-        cfg.DATASET_POLARITY_COLUMN,
-        cfg.DATASET_TITLE_COLUMN,
-        cfg.DATASET_MESSAGE_COLUMN,
+        DATASET_POLARITY_COLUMN,
+        DATASET_TITLE_COLUMN,
+        DATASET_MESSAGE_COLUMN,
     ]
 
-    print(f"[EVAL] Test load from {test_path} ({len(df_test)} rows)")
+    print(f"[EVAL] Test load from {DATASET_RAW_TEST_PARQUET} ({len(df_test)} rows)")
 
     return df_test
+
+
+def _save_processed_test_dataset(df_test_processed: pd.DataFrame):
+    """
+    Save processed test dataset to be reused by monitoring.
+
+    It writes the file to:
+        ./data/processed/test_processed.parquet
+    (or to the path defined by DATASET_PROCESSED_PATH)
+    """
+    DATASET_PROCESSED_PATH.mkdir(parents=True, exist_ok=True)
+
+    df_test_processed.to_parquet(DATASET_PROCESSED_TEST_PATH)
+
+    print(f"[evaluate] Saved processed test dataset to: {DATASET_PROCESSED_TEST_PATH}")
 
 
 def evaluate(model_version: str | None = None) -> None:
@@ -29,14 +51,15 @@ def evaluate(model_version: str | None = None) -> None:
     """
     df_test = _load_test_dataset()
 
+    df_test_processed = preprocess_df(df_test)
+    _save_processed_test_dataset(df_test_processed)
+
     model_uri = resolve_model_uri(model_version)
     model = mlflow.pyfunc.load_model(model_uri)
     print(f"[EVAL] Load model: {model_uri}")
 
-    X_test = preprocess_df(df_raw=df_test)
-
-    y_true_pred = model.predict(X_test[cfg.DATASET_FULL_TEXT_COLUMN])
-    y_true_test = df_test[cfg.DATASET_POLARITY_COLUMN].to_numpy()
+    y_true_pred = model.predict(df_test_processed[DATASET_FULL_TEXT_COLUMN])
+    y_true_test = df_test[DATASET_POLARITY_COLUMN].to_numpy()
 
     with mlflow.start_run(run_name="evaluate", nested=True):
         mlflow.log_param("model_uri", model_uri)

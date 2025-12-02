@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 
 import mlflow
 from src.model import config as cfg
-from src.model.pipeline.metrics_helper import validate
+from src.model.utilities.metrics_helper import validate
 
 
 def _generate_tokeninzer_tfidf() -> TfidfVectorizer:

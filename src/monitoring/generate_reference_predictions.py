@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 
 from src.monitoring.config import (
+    ALLOW_RUNTIME_MODEL_DOWNLOAD,
     MODEL_PATH,
     REFERENCE_PREDICTIONS_PATH,
     TEST_DATA_PATH,
@@ -52,7 +53,10 @@ def generate_reference_predictions() -> Path:
     texts = df_val[TEST_FULL_TEXT_COLUMN]
 
     print("[reference] Loading model...")
-    model = load_model(model_local_path=MODEL_PATH)
+    model = load_model(
+        model_local_path=MODEL_PATH,
+        allow_runtime_model_download=ALLOW_RUNTIME_MODEL_DOWNLOAD,
+    )
 
     print("[reference] Generating predictions for reference dataset...")
     labels, confidences = infer_predictions_with_confidence(model, texts)

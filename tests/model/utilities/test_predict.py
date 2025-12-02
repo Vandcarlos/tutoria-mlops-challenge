@@ -3,7 +3,7 @@ import sys
 
 import pytest
 
-import src.model.pipeline.predict as predict
+import src.model.utilities.predict as predict
 
 
 class FakePredObj:

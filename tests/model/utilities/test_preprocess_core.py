@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-import src.model.data.preprocess_core
+import src.model.utilities.preprocess_core as preprocess_core
 
 
 def _test_title_and_text_null_treatment_fills_no_nulls():
@@ -12,7 +12,7 @@ def _test_title_and_text_null_treatment_fills_no_nulls():
         }
     )
 
-    df_cleaned = src.model.data.preprocess_core._title_and_text_null_treatment(df_input)
+    df_cleaned = preprocess_core._title_and_text_null_treatment(df_input)
 
     assert len(df_cleaned) == len(df_input)
     assert df_cleaned["title"].isna().sum() == 0
@@ -27,7 +27,7 @@ def _test_title_and_text_remove_both_nulls_columns():
         }
     )
 
-    df_cleaned = src.model.data.preprocess_core._title_and_text_null_treatment(df_input)
+    df_cleaned = preprocess_core._title_and_text_null_treatment(df_input)
 
     assert len(df_cleaned) == 1
     assert df_cleaned["title"].isna().sum() == 0
@@ -39,12 +39,10 @@ def test_title_and_text_null_treatment_raises_keyerror_on_missing_columns():
     df_missing_message = pd.DataFrame({"title": ["Title 1", "Title 2"]})
 
     with pytest.raises(KeyError):
-        src.model.data.preprocess_core._title_and_text_null_treatment(df_missing_title)
+        preprocess_core._title_and_text_null_treatment(df_missing_title)
 
     with pytest.raises(KeyError):
-        src.model.data.preprocess_core._title_and_text_null_treatment(
-            df_missing_message
-        )
+        preprocess_core._title_and_text_null_treatment(df_missing_message)
 
 
 @pytest.mark.parametrize(
@@ -70,7 +68,7 @@ def test_title_and_text_null_treatment_raises_keyerror_on_missing_columns():
     ],
 )
 def test_preprocess_record(title, message, expected):
-    result = src.model.data.preprocess_core._preprocess_record(title, message)
+    result = preprocess_core._preprocess_record(title, message)
     assert result == expected
 
 
@@ -88,7 +86,7 @@ def test_build_full_text():
         }
     )
 
-    df_processed = src.model.data.preprocess_core._build_full_text(df_input)
+    df_processed = preprocess_core._build_full_text(df_input)
 
     expected_texts = [
         "hello world this is a test message.",
@@ -115,7 +113,7 @@ def test_preprocess_df():
         }
     )
 
-    df_processed = src.model.data.preprocess_core.preprocess_df(df_input)
+    df_processed = preprocess_core.preprocess_df(df_input)
 
     expected_texts = [
         "hello world this is a test message.",

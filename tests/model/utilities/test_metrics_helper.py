@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from sklearn.metrics import accuracy_score, f1_score
 
-import src.model.pipeline.metrics_helper as metrics_helper
+import src.model.utilities.metrics_helper as metrics_helper
 
 
 def test_validate_returns_correct_metrics_and_logs_to_mlflow(monkeypatch):

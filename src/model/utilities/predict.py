@@ -6,7 +6,7 @@ from typing import Any
 import pandas as pd
 
 import mlflow
-from src.model.data.preprocess_core import preprocess_df
+from src.model.utilities.preprocess_core import preprocess_df
 from src.shared.model_resolver import resolve_model_uri
 from src.shared.schemas import PredictionLabel
 

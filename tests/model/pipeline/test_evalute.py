@@ -1,54 +1,89 @@
 import sys
+from types import SimpleNamespace
+
+import pandas as pd
 
 import src.model.pipeline.evaluate as evaluate
 
 
-def _mock_test_dataset_file(tmp_path, monkeypatch):
-    test_path = tmp_path / "test.csv"
-    test_path.write_text("1,Title A,Message A\n0,Title B,Message B\n")
+def _mock_test_dataset(monkeypatch):
+    """
+    Patch evaluate._load_test_dataset to read a small in-memory DataFrame
+    by mocking pandas.read_parquet.
+    """
+    df = pd.DataFrame(
+        [
+            [1, "Title A", "Message A"],
+            [0, "Title B", "Message B"],
+        ],
+        columns=[
+            evaluate.DATASET_POLARITY_COLUMN,
+            evaluate.DATASET_TITLE_COLUMN,
+            evaluate.DATASET_MESSAGE_COLUMN,
+        ],
+    )
 
-    monkeypatch.setattr(evaluate.cfg, "DATASET_RAW_PATH", tmp_path, raising=True)
+    def fake_read_parquet(path):
+        return df
 
-    return test_path
+    monkeypatch.setattr(evaluate.pd, "read_parquet", fake_read_parquet)
+
+    return df
 
 
-def test_load_test_dataset(tmp_path, monkeypatch):
-    _mock_test_dataset_file(tmp_path, monkeypatch)
+def test_load_test_dataset(monkeypatch):
+    df_expected = _mock_test_dataset(monkeypatch)
 
     df_test = evaluate._load_test_dataset()
 
-    assert len(df_test) == 2
-    assert list(df_test.columns) == [
-        evaluate.cfg.DATASET_POLARITY_COLUMN,
-        evaluate.cfg.DATASET_TITLE_COLUMN,
-        evaluate.cfg.DATASET_MESSAGE_COLUMN,
+    assert len(df_test) == len(df_expected)
+    assert list(df_test.columns) == list(df_expected.columns)
+    assert df_test[evaluate.DATASET_POLARITY_COLUMN].tolist() == [1, 0]
+    assert df_test[evaluate.DATASET_TITLE_COLUMN].tolist() == ["Title A", "Title B"]
+    assert df_test[evaluate.DATASET_MESSAGE_COLUMN].tolist() == [
+        "Message A",
+        "Message B",
     ]
 
 
-def test_evaluate_logs_metrics(tmp_path, monkeypatch):
-    _mock_test_dataset_file(tmp_path, monkeypatch)
+def test_evaluate_logs_metrics(monkeypatch):
+    df = _mock_test_dataset(monkeypatch)
 
+    # Dummy model that returns fixed predictions
     class MockModel:
         def predict(self, X):
-            return [1]
+            return [1, 1]
 
-    def mock_load_model(model_uri):
-        return MockModel()
+    # Fake mlflow module
+    class DummyRun:
+        def __enter__(self):
+            return self
 
-    monkeypatch.setattr(evaluate.mlflow.pyfunc, "load_model", mock_load_model)
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return False
 
-    # Capture mlflow logs
-    logged_params = {}
-    logged_metrics = {}
+    class DummyMlflow:
+        def __init__(self):
+            self.logged_params = {}
+            self.logged_metrics = {}
+            self.pyfunc = SimpleNamespace(load_model=lambda uri: MockModel())
 
-    def mock_log_param(key, value):
-        logged_params[key] = value
+        def start_run(self, run_name=None, nested=None):
+            return DummyRun()
 
-    def mock_log_metric(key, value):
-        logged_metrics[key] = value
+        def log_param(self, key, value):
+            self.logged_params[key] = value
 
-    monkeypatch.setattr(evaluate.mlflow, "log_param", mock_log_param)
-    monkeypatch.setattr(evaluate.mlflow, "log_metric", mock_log_metric)
+        def log_metric(self, key, value):
+            self.logged_metrics[key] = value
+
+    dummy_mlflow = DummyMlflow()
+    monkeypatch.setattr(evaluate, "mlflow", dummy_mlflow)
+
+    def mock_resolve_model_uri(model_version):
+        return "models:/sentiment-analysis/Production"
+
+    monkeypatch.setattr(evaluate, "resolve_model_uri", mock_resolve_model_uri)
 
     expected_metrics = {
         "accuracy": 0.5,
@@ -56,20 +91,30 @@ def test_evaluate_logs_metrics(tmp_path, monkeypatch):
     }
 
     def mock_validate(y_true, y_pred, split_name, log_report):
-        assert y_true.tolist() == [1, 0]
-        assert y_pred.tolist() == [1, 1]
+        assert y_true.tolist() == df[evaluate.DATASET_POLARITY_COLUMN].tolist()
+        assert y_pred == [1, 1]
+        assert split_name == "test"
+        assert log_report is True
 
         for key, value in expected_metrics.items():
-            evaluate.mlflow.log_metric(f"{split_name}_{key}", value)
+            dummy_mlflow.log_metric(f"{split_name}_{key}", value)
 
         return expected_metrics
 
     monkeypatch.setattr(evaluate, "validate", mock_validate)
+
     evaluate.evaluate(model_version=None)
 
+    assert "model_uri" in dummy_mlflow.logged_params
+    assert (
+        dummy_mlflow.logged_params["model_uri"]
+        == "models:/sentiment-analysis/Production"
+    )
+
     for key, value in expected_metrics.items():
-        assert f"test_{key}" in logged_metrics
-        assert logged_metrics[f"test_{key}"] == value
+        metric_key = f"test_{key}"
+        assert metric_key in dummy_mlflow.logged_metrics
+        assert dummy_mlflow.logged_metrics[metric_key] == value
 
 
 def test_main(monkeypatch):

@@ -44,11 +44,14 @@ class FakeMlflow:
     """
 
     def __init__(self) -> None:
+        # Mantemos esse atributo só para compatibilidade, mesmo não sendo usado
         self.tracking_uri: str | None = None
         self.sklearn = FakeSklearnSubmodule()
         self.artifacts = FakeArtifactsSubmodule()
 
     def set_tracking_uri(self, uri: str) -> None:
+        # Hoje o código real não chama isso, então não será utilizado,
+        # mas deixamos aqui para não quebrar caso no futuro você volte a usar.
         self.tracking_uri = uri
 
 
@@ -56,7 +59,6 @@ class FakeMlflow:
 def fake_mlflow(monkeypatch) -> FakeMlflow:
     """
     Replace model_resolver.mlflow by a lightweight fake that lets us assert:
-    - tracking URI used
     - which paths were loaded
     - which artifacts were downloaded
     """
@@ -198,7 +200,6 @@ def test_load_model_uses_local_directory_when_not_empty(
 ):
     """
     If model_local_path exists and is not empty, load_model must:
-    - set tracking URI
     - NOT call resolve_model_uri
     - NOT download artifacts
     - load model directly from local path via mlflow.sklearn.load_model
@@ -217,14 +218,6 @@ def test_load_model_uses_local_directory_when_not_empty(
         model_resolver, "resolve_model_uri", fake_resolve_model_uri, raising=True
     )
 
-    # Override tracking URI to a recognizable value
-    monkeypatch.setattr(
-        model_resolver,
-        "MLFLOW_TRACKING_URI",
-        "file:./mlruns",
-        raising=False,
-    )
-
     model = model_resolver.load_model(
         model_local_path=model_dir,
         allow_runtime_model_download=True,  # should be ignored because directory is not empty
@@ -232,7 +225,6 @@ def test_load_model_uses_local_directory_when_not_empty(
 
     # Assertions
     assert isinstance(model, FakeModel)
-    assert fake_mlflow.tracking_uri == "file:./mlruns"
     assert fake_mlflow.sklearn.loaded_paths == [str(model_dir)]
     assert fake_mlflow.artifacts.download_calls == []
 
@@ -272,7 +264,6 @@ def test_load_model_downloads_and_loads_when_allowed(
 ):
     """
     If directory is empty and allow_runtime_model_download=True, load_model must:
-    - set tracking URI
     - call resolve_model_uri(version=...)
     - download artifacts to the local directory
     - load the model from that local directory
@@ -280,14 +271,6 @@ def test_load_model_downloads_and_loads_when_allowed(
 
     model_dir: Path = tmp_path / "model"
     model_dir.mkdir()  # empty at start
-
-    # Make tracking URI explicit to assert it
-    monkeypatch.setattr(
-        model_resolver,
-        "MLFLOW_TRACKING_URI",
-        "http://mlflow:5000",
-        raising=False,
-    )
 
     # Fake resolve_model_uri to assert arguments and return a fixed URI
     called: dict[str, str | None] = {}
@@ -308,9 +291,6 @@ def test_load_model_downloads_and_loads_when_allowed(
 
     # Model was returned
     assert isinstance(model, FakeModel)
-
-    # Tracking URI was set
-    assert fake_mlflow.tracking_uri == "http://mlflow:5000"
 
     # resolve_model_uri was called with the given version
     assert called["version"] == "7"
