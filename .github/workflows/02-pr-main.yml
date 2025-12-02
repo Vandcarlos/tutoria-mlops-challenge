@@ -12,6 +12,10 @@ on:
       - "shared/**"
       - "tests/**"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   lint:
     uses: ./.github/workflows/_reusable-lint.yml
