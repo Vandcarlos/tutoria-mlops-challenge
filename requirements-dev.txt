@@ -12,4 +12,4 @@ nbqa==1.9.1
 
 # Tests
 pytest==9.0.1
-pytest-cov==7.10.6
+pytest-cov==7.0.0
