@@ -1,0 +1,103 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "infra/**"
+      - "src/**"
+      - "api/**"
+      - "model/**"
+      - "monitoring/**"
+      - "shared/**"
+      - "tests/**"
+  workflow_dispatch: {}
+
+jobs:
+  lint:
+    uses: ./.github/workflows/_reusable-lint.yml
+    with:
+      working-directory: .
+    secrets:
+      inherit
+
+  tests:
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      working-directory: .
+    secrets:
+      inherit
+
+  terraform-plan-apply:
+    uses: ./.github/workflows/_reusable-terraform-plan.yml
+    with:
+      working-directory: infra/envs/prod
+      execute-apply: true
+    secrets:
+      aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}
+
+  detect-changes:
+    runs-on: ubuntu-latest
+
+    outputs:
+      api_changed: ${{ steps.filter.outputs.api }}
+      model_changed: ${{ steps.filter.outputs.model }}
+      monitoring_changed: ${{ steps.filter.outputs.monitoring }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - 'api/**'
+              - 'shared/**'
+            model:
+              - 'model/**'
+              - 'shared/**'
+            monitoring:
+              - 'monitoring/**'
+              - 'shared/**'
+
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: [lint, tests, terraform-apply-prod, detect-changes]
+    if: needs.detect-changes.outputs.api_changed == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy API
+        run: |
+          echo "TODO: Deploy API (build image, push to ECR, update ECS, etc.)"
+
+  deploy-model:
+    runs-on: ubuntu-latest
+    needs: [lint, tests, terraform-apply-prod, detect-changes]
+    if: needs.detect-changes.outputs.model_changed == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Model Service
+        run: |
+          echo "TODO: Deploy MODEL"
+
+  deploy-monitoring:
+    runs-on: ubuntu-latest
+    needs: [lint, tests, terraform-apply-prod, detect-changes]
+    if: needs.detect-changes.outputs.monitoring_changed == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Monitoring
+        run: |
+          echo "TODO: Deploy MONITORING"

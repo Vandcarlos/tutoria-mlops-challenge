@@ -1,5 +1,6 @@
 -r requirments-api.txt
--r requirments-model.text
+-r requirments-model.txt
+-r requirments-monitoring.txt
 
 # Notebooks
 notebook==7.4.7
