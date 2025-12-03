@@ -12,14 +12,8 @@ terraform {
 }
 
 locals {
-  # Prefixo "lógico" (pode ser grande, usado em tags, etc.)
-  name_prefix = "tutoria-mlops-challenge-prod-alb"
-
-  # Nomes reais dos recursos, respeitando limites da AWS
   lb_name = substr(local.name_prefix, 0, 31)
-
   tg_name = substr("${local.name_prefix}-tg", 0, 31)
-
   sg_name = substr("${local.name_prefix}-sg", 0, 31)
 }
 
