@@ -11,11 +11,23 @@ terraform {
   }
 }
 
+locals {
+  # Prefixo "lógico" (pode ser grande, usado em tags, etc.)
+  name_prefix = "tutoria-mlops-challenge-prod-alb"
+
+  # Nomes reais dos recursos, respeitando limites da AWS
+  lb_name = substr(local.name_prefix, 0, 31)
+
+  tg_name = substr("${local.name_prefix}-tg", 0, 31)
+
+  sg_name = substr("${local.name_prefix}-sg", 0, 31)
+}
+
 # ----------------------------------------
 # Security Group for the ALB
 # ----------------------------------------
 resource "aws_security_group" "alb_sg" {
-  name        = substr("${local.name_prefix}-tg", 0, 31)
+  name        = local.sg_name
   description = "Security group for ${local.name_prefix}"
   vpc_id      = var.vpc_id
 
@@ -59,7 +71,7 @@ resource "aws_lb" "this" {
 # Target Group
 # ----------------------------------------
 resource "aws_lb_target_group" "this" {
-  name        = "${local.name_prefix}-tg"
+  name        = local.tg_name
   port        = var.target_group_port
   protocol    = var.target_group_protocol
   target_type = "ip"
