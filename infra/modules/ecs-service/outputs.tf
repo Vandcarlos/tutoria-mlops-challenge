@@ -6,9 +6,9 @@ output "service_name" {
   value       = aws_ecs_service.this.name
 }
 
-output "service_arn" {
+output "service_id" {
   description = "ARN of the ECS service"
-  value       = aws_ecs_service.this.arn
+  value       = aws_ecs_service.this.id
 }
 
 output "task_definition_arn" {

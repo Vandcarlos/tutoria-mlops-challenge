@@ -38,7 +38,7 @@ resource "aws_subnet" "private" {
 resource "aws_eip" "nat" {
   count = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : length(aws_subnet.public)) : 0
 
-  vpc = true
+  domain = "vpc"
 
   tags = merge(
     local.merged_tags,
