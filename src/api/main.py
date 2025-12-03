@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from src.api.config import (
@@ -11,19 +13,25 @@ from src.shared.model_resolver import load_model
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Sentiment API")
-
     prediction_logger = LocalPredictionLogger()
-    app.state.prediction_logger = prediction_logger
 
-    model = load_model(
-        model_local_path=MODEL_PATH,
-        version=MLFLOW_MODEL_VERSION,
-        allow_runtime_model_download=ALLOW_RUNTIME_MODEL_DOWNLOAD,
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        app.state.prediction_logger = prediction_logger
+
+        model = load_model(
+            model_local_path=MODEL_PATH,
+            version=MLFLOW_MODEL_VERSION,
+            allow_runtime_model_download=ALLOW_RUNTIME_MODEL_DOWNLOAD,
+        )
+        app.state.model = model
+
+        yield
+
+    app = FastAPI(
+        title="Sentiment API",
+        lifespan=lifespan,
     )
-
-    app.state.model = model
-
     app.include_router(router, prefix="/api/v1")
 
     return app

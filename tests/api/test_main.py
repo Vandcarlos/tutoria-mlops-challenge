@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 import src.api.main as main
 
@@ -16,7 +17,6 @@ def test_router_is_included_with_prefix(monkeypatch):
     Ensure the router from src.api.routes is included with prefix /api/v1.
     """
 
-    # --- Arrange: create a fake router to detect inclusion ---
     class FakeRouter:
         def __init__(self):
             self.included = False
@@ -24,21 +24,36 @@ def test_router_is_included_with_prefix(monkeypatch):
 
     fake_router = FakeRouter()
 
-    # patch the router imported in main.py
     monkeypatch.setattr(main, "router", fake_router, raising=True)
 
-    # We need to reload main so that include_router() runs again
-    import importlib
-
-    main_reloaded = importlib.reload(main)
-
-    # --- Act: inspect the routes registered in FastAPI instance ---
-    # FastAPI stores included routes in app.routes
     matches = [
         r
-        for r in main_reloaded.app.router.routes
+        for r in main.app.router.routes
         if getattr(r, "path", "").startswith("/api/v1")
     ]
 
     # --- Assert ---
     assert len(matches) > 0, "Router should be included under /api/v1"
+
+
+class FakeModel:
+    def predict(self, X):
+        return [1 for _ in X]
+
+    def predict_proba(self, X):
+        return [[0.1, 0.9] for _ in X]
+
+
+def test_predict_endpoint(monkeypatch):
+    def fake_load_model(*args, **kwargs):
+        return FakeModel()
+
+    monkeypatch.setattr(main, "load_model", fake_load_model)
+
+    with TestClient(main.app) as client:
+        resp = client.post(
+            "/api/v1/predict",
+            json={"title": "Great", "message": "Awesome product"},
+        )
+
+        assert resp.status_code == 200
