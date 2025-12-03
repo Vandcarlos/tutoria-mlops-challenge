@@ -30,8 +30,6 @@ def test_router_is_included_with_prefix(monkeypatch):
     # We need to reload main so that include_router() runs again
     import importlib
 
-    import src.api.main as main_reload  # noqa: F401
-
     main_reloaded = importlib.reload(main)
 
     # --- Act: inspect the routes registered in FastAPI instance ---

@@ -37,13 +37,13 @@ airflow-down:
 	docker compose -f airflow/docker-compose.yml down
 
 # -------------------------------
-#  Notebooks
+#  Quality checks
 # -------------------------------
 
-fix-notebooks:
-	for nb in notebooks/*.ipynb; do \
-		nbqa ruff --fix "$$nb"; \
-	done
+quality-lint:
+	ruff format .
+	ruff check src --fix
+	ruff check src
 
 # -------------------------------
 #  Model commands
