@@ -14,7 +14,7 @@ module "mlflow_db" {
 
   instance_class        = "db.t3.micro"
   allocated_storage     = 20
-  engine_version        = "15.4"
+  engine_version        = "15.10"
   multi_az              = false
   publicly_accessible   = false
   backup_retention_period = 7
