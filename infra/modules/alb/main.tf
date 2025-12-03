@@ -15,7 +15,7 @@ terraform {
 # Security Group for the ALB
 # ----------------------------------------
 resource "aws_security_group" "alb_sg" {
-  name        = substr("${local.name_prefix}-tg", 0, 32)
+  name        = substr("${local.name_prefix}-tg", 0, 31)
   description = "Security group for ${local.name_prefix}"
   vpc_id      = var.vpc_id
 
