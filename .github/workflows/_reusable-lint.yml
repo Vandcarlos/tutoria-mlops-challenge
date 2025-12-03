@@ -1,0 +1,36 @@
+name: Reusable Lint
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "Directory where the Python project is located"
+        required: false
+        type: string
+        default: "."
+    secrets:
+      dummy:
+        required: false
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          pip install -r requirements-dev.txt
+
+      - name: Ruff lint
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          ruff check .

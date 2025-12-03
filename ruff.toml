@@ -3,8 +3,9 @@ target-version = "py311"
 
 [lint]
 select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
 fixable = ["E", "F", "I", "B", "UP"]
-extend-select = ["RUF010"]
+extend-select = ["RUF010", "RUF100"]
 
 [format]
 quote-style = "double"

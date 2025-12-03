@@ -40,7 +40,6 @@ def test_load_prediction_logs_filters_by_lookback_days(monkeypatch, tmp_path):
 
     # Fix "current time"
     now = datetime(2025, 1, 10, 12, 0, 0, tzinfo=UTC)
-    cutoff = now - timedelta(days=7)
 
     class FixedDatetime(datetime):
         @classmethod
@@ -49,7 +48,6 @@ def test_load_prediction_logs_filters_by_lookback_days(monkeypatch, tmp_path):
 
     monkeypatch.setattr(log_loader, "datetime", FixedDatetime, raising=True)
 
-    # Create two files: one recent, one older than cutoff
     recent_ts = now - timedelta(days=1)  # should be included
     old_ts = now - timedelta(days=10)  # should be filtered out
 

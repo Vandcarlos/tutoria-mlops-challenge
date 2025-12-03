@@ -31,7 +31,7 @@ def _reload_config(monkeypatch, **env_overrides):
         monkeypatch.setenv(k, v)
 
     # Reimporta / recarrega o módulo
-    import src.api.config as cfg  # noqa: F401
+    import src.api.config as cfg
 
     return importlib.reload(cfg)
 
