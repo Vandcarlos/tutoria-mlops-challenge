@@ -1,19 +1,19 @@
 module "alb_mlflow" {
-  source = "../../modules/alb"
+  source = "../../../modules/alb"
 
-  project_name = "tutoria-mlops"
-  environment  = "prod"
+  project_name = var.project_name
+  environment  = var.environment
 
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnet_ids
+  vpc_id     = var.vpc_id
+  subnet_ids = var.public_subnet_ids
 
   # Para o MLflow, vamos expor direto na porta 5000 (externo = interno)
-  internal           = false
-  listener_port      = 5000
-  listener_protocol  = "HTTP"
-  target_group_port  = 5000
+  internal              = false
+  listener_port         = 5000
+  listener_protocol     = "HTTP"
+  target_group_port     = 5000
   target_group_protocol = "HTTP"
-  health_check_path  = "/"
+  health_check_path     = "/"
 
   # Em prod, idealmente restringir isso pro seu IP/office/VPN
   allowed_ingress_cidrs = [
@@ -21,7 +21,10 @@ module "alb_mlflow" {
   ]
 
   tags = {
-    Service = "mlflow"
+    Project     = var.project_name
+    Environment = var.environment
+    Owner       = var.owner
+    Service     = "mlflow"
   }
 }
 

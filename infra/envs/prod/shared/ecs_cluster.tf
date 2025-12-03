@@ -1,12 +1,12 @@
 module "ecs_cluster" {
-  source = "../../modules/ecs-cluster"
+  source = "../../../modules/ecs-cluster"
 
-  project_name             = "tutoria-mlops"
-  environment              = "prod"
-  aws_region               = "us-east-1"
+  project_name              = var.project_name
+  environment               = var.environment
+  aws_region                = var.aws_region
   enable_container_insights = true
 
   tags = {
-    Owner = "vand"
+    Owner = var.owner
   }
 }

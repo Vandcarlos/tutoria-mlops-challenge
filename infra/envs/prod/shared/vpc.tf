@@ -1,8 +1,8 @@
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/vpc"
 
-  project_name   = "tutoria-mlops"
-  environment    = "prod"
+  project_name   = var.project_name
+  environment    = var.environment
   vpc_cidr_block = "10.0.0.0/16"
 
   azs = [
@@ -20,10 +20,10 @@ module "vpc" {
     "10.0.11.0/24",
   ]
 
-  enable_nat_gateway  = true
-  single_nat_gateway  = true
+  enable_nat_gateway = true
+  single_nat_gateway = true
 
   tags = {
-    Owner = "vand"
+    Owner = var.owner
   }
 }

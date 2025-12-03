@@ -4,16 +4,16 @@ locals {
 }
 
 module "mlflow" {
-  source = "../../modules/mlflow-ecs"
+  source = "../../../modules/mlflow-ecs"
 
-  project_name = "tutoria-mlops"
-  environment  = "prod"
-  aws_region   = "us-east-1"
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
 
-  vpc_id             = module.vpc.vpc_id
-  private_subnet_ids = module.vpc.private_subnet_ids
+  vpc_id             = var.vpc_id
+  private_subnet_ids = var.private_subnet_ids
 
-  ecs_cluster_arn = module.ecs_cluster.cluster_arn
+  ecs_cluster_arn = var.ecs_cluster_arn
 
   alb_target_group_arn  = module.alb_mlflow.target_group_arn
   alb_security_group_id = module.alb_mlflow.security_group_id

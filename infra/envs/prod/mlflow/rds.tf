@@ -1,12 +1,12 @@
 module "mlflow_db" {
-  source = "../../modules/rds-postgres"
+  source = "../../../modules/rds-postgres"
 
-  project_name = "tutoria-mlops"
-  environment  = "prod"
+  project_name = var.project_name
+  environment  = var.environment
 
-  vpc_id        = module.vpc.vpc_id
-  subnet_ids    = module.vpc.private_subnet_ids
-  vpc_cidr_block = module.vpc.vpc_cidr_block
+  vpc_id        = var.vpc_id
+  subnet_ids    = var.private_subnet_ids
+  vpc_cidr_block = var.vpc_cidr_block
 
   db_name  = "mlflow"
   username = "mlflow_user"
@@ -22,8 +22,9 @@ module "mlflow_db" {
   skip_final_snapshot   = false
 
   tags = {
-    Project     = "tutoria-mlops"
-    Environment = "prod"
+    Project     = var.project_name
+    Environment = var.environment
+    Owner       = var.owner
     Service     = "mlflow"
   }
 }

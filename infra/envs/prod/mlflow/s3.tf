@@ -1,13 +1,14 @@
 module "mlflow_artifacts_bucket" {
-  source = "../../modules/s3-bucket"
+  source = "../../../modules/s3-bucket"
 
   bucket_name        = "tutoria-mlops-prod-mlflow-artifacts" # precisa ser único globalmente
   versioning_enabled = true
   force_destroy      = false
 
   tags = {
-    Project     = "tutoria-mlops"
-    Environment = "prod"
+    Project     = var.project_name
+    Environment = var.environment
+    Owner       = var.owner
     Service     = "mlflow"
   }
 }

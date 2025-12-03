@@ -17,9 +17,3 @@ variable "environment" {
   type        = string
   description = "The environment for resource naming and tagging."
 }
-
-variable "mlflow_db_password" {
-  description = "Master password for the MLflow RDS database"
-  type        = string
-  sensitive   = true
-}

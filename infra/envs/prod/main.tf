@@ -1,8 +1,24 @@
-# Here you will call your modules (s3, ecr, iam, etc.).
-# For now, keeping it empty is fine – Terraform will just create the remote state backend.
+module "shared" {
+  source       = "./shared"
+  owner        = var.owner
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
 
-# example in future:
-# module "data_bucket" {
-#   source      = "../../modules/s3_bucket"
-#   bucket_name = "${var.project}-data-prod"
-# }
+}
+
+module "mlflow_env" {
+  source       = "./mlflow"
+  owner        = var.owner
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  vpc_id             = module.shared.vpc_id
+  private_subnet_ids = module.shared.private_subnet_ids
+  public_subnet_ids  = module.shared.public_subnet_ids
+  vpc_cidr_block     = module.shared.vpc_cidr_block
+  ecs_cluster_arn    = module.shared.ecs_cluster_arn
+
+  mlflow_db_password = var.mlflow_db_password
+}
