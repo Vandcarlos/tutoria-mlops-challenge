@@ -19,6 +19,9 @@ on:
       aws-region:
         description: "AWS region"
         required: true
+      mlflow-db-password:
+        description: "MLflow DB password (exported as TF_VAR_mlflow_db_password)"
+        required: false
 
 jobs:
   terraform-plan:
@@ -53,9 +56,13 @@ jobs:
 
       - name: Terraform plan (for apply, using tfvars)
         working-directory: ${{ inputs.working-directory }}
+        env:
+          TF_VAR_mlflow_db_password: ${{ secrets.mlflow-db-password }}
         run: terraform plan -no-color -out=tfplan
 
       - name: Terraform apply
         working-directory: ${{ inputs.working-directory }}
         if: ${{ inputs.execute-apply == true }}
+        env:
+          TF_VAR_mlflow_db_password: ${{ secrets.mlflow-db-password }}
         run: terraform apply -auto-approve tfplan
