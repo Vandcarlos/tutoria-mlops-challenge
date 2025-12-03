@@ -40,6 +40,8 @@ jobs:
     secrets:
       aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
       aws-region: ${{ secrets.AWS_REGION }}
+      mlflow-db-password: ${{ secrets.MLFLOW_DB_PASSWORD }}
+
 
   detect-changes:
     runs-on: ubuntu-latest

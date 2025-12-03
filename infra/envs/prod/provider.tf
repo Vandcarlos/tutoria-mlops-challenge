@@ -14,7 +14,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project = var.project
+      Project = var.project_name
       Env     = "prod"
     }
   }
