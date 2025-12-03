@@ -13,8 +13,3 @@ variable "mlflow_db_password" {
   type        = string
   sensitive   = true
 }
-
-variable "mlflow_container_image" {
-  type        = string
-  description = "ECR image URL used by the MLflow ECS service"
-}
