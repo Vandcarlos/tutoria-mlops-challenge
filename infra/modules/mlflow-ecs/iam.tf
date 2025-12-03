@@ -3,7 +3,7 @@
 // Responsible for creating the IAM roles and policies for the MLflow ECS task.
 
 module "mlflow_task_iam" {
-  source = "../iam-task"
+  source = "../iam"
 
   name_prefix   = local.name_prefix
   s3_bucket_arn = var.mlflow_artifact_bucket_arn
