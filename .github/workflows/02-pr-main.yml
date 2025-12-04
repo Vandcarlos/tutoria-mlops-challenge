@@ -4,13 +4,12 @@ on:
   pull_request:
     branches: [ main ]
     paths:
+      - ".github/**"
       - "infra/**"
       - "src/**"
       - "api/**"
-      - "model/**"
-      - "monitoring/**"
-      - "shared/**"
-      - "tests/**"
+      - "docker/**"
+      - "requirements-*.txt"
 
 permissions:
   contents: read

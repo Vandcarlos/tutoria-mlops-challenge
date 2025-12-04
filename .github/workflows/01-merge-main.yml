@@ -4,13 +4,12 @@ on:
   push:
     branches: [ main ]
     paths:
+      - ".github/**"
       - "infra/**"
       - "src/**"
       - "api/**"
-      - "model/**"
-      - "monitoring/**"
-      - "shared/**"
-      - "tests/**"
+      - "docker/**"
+      - "requirements-*.txt"
   workflow_dispatch: {}
 
 permissions:
