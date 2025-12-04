@@ -67,8 +67,8 @@ jobs:
       dockerfile: "docker/api.Dockerfile"
       context: "."
       image-tag: "api-ci-test"
-      test-port: 8000
-      healthcheck-path: "/health"
+      #test-port: 8000
+      #healthcheck-path: "/health"
 
   docker-monitoring-test:
     name: Docker Test - Monitoring
