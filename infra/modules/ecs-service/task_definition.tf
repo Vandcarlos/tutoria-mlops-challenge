@@ -24,9 +24,9 @@ resource "aws_ecs_task_definition" "this" {
       ]
 
       environment = [
-        for env_var in var.environment : {
-          name  = env_var.name
-          value = env_var.value
+        for k, v in var.environment : {
+          name  = k
+          value = v
         }
       ]
 
@@ -34,7 +34,7 @@ resource "aws_ecs_task_definition" "this" {
         logDriver = "awslogs"
         options = {
           awslogs-group         = var.log_group_name
-          awslogs-region        = var.log_group_region
+          awslogs-region        = local.aws_region
           awslogs-stream-prefix = var.container_name
         }
       }

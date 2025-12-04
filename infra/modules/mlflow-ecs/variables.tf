@@ -13,11 +13,6 @@ variable "environment" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "AWS region where MLflow will run (e.g. us-east-1)"
-  type        = string
-}
-
 variable "vpc_id" {
   description = "VPC ID where the ECS tasks will run"
   type        = string

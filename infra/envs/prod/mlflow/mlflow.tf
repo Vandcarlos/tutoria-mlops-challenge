@@ -11,7 +11,6 @@ module "mlflow" {
 
   project_name = var.project_name
   environment  = var.environment
-  aws_region   = var.aws_region
 
   vpc_id             = var.vpc_id
   private_subnet_ids = var.private_subnet_ids

@@ -19,24 +19,16 @@ module "mlflow_ecs_service" {
   desired_count    = var.desired_count
   target_group_arn = var.alb_target_group_arn
 
-  task_role_arn       = module.mlflow_task_iam.task_role_arn
-  execution_role_arn  = module.mlflow_task_iam.execution_role_arn
-  log_group_name      = module.mlflow_logs.log_group_name
-  log_group_region    = var.aws_region
-  assign_public_ip    = false
+  task_role_arn      = module.mlflow_task_iam.task_role_arn
+  execution_role_arn = module.mlflow_task_iam.execution_role_arn
+  log_group_name     = module.mlflow_logs.log_group_name
+  assign_public_ip   = false
 
-  environment = [
-    {
-      name  = "MLFLOW_BACKEND_STORE_URI"
-      value = var.mlflow_backend_store_uri
-    },
-    {
-      name  = "MLFLOW_ARTIFACT_ROOT"
-      value = var.mlflow_artifact_root
-    },
-    {
-      name  = "AWS_DEFAULT_REGION"
-      value = var.aws_region
-    }
-  ]
+  environment = {
+    ENVIRONMENT                  = var.environment
+    AWS_REGION                   = local.aws_region
+    MLFLOW_BACKEND_STORE_URI     = var.mlflow_backend_store_uri
+    MLFLOW_ARTIFACT_ROOT         = var.mlflow_artifact_root
+    ALLOW_RUNTIME_MODEL_DOWNLOAD = true
+  }
 }

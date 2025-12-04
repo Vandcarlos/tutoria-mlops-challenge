@@ -1,9 +1,9 @@
-module "ecr_training" {
+module "ecr_model" {
   source = "../../../modules/ecr"
 
   project_name  = var.project_name
   environment   = var.environment
-  service_name  = "training"
+  service_name  = "model"
 
   image_mutability = "MUTABLE"
   scan_on_push     = true
