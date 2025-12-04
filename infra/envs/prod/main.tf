@@ -3,8 +3,6 @@ module "shared_env" {
   owner        = var.owner
   project_name = var.project_name
   environment  = var.environment
-  aws_region   = var.aws_region
-
 }
 
 module "mlflow_env" {
@@ -26,7 +24,6 @@ module "data_bucket_env" {
   source       = "./data_bucket"
   environment  = var.environment
   project_name = var.project_name
-  aws_region   = var.aws_region
 }
 
 module "model_env" {

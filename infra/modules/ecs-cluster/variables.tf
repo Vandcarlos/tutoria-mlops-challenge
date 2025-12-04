@@ -11,11 +11,6 @@ variable "environment" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "AWS region where the ECS cluster will be created (e.g. us-east-1)"
-  type        = string
-}
-
 variable "enable_container_insights" {
   description = "Enable CloudWatch Container Insights for this ECS cluster"
   type        = bool

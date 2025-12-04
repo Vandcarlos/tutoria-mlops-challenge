@@ -1,8 +1,7 @@
 module "alb_api" {
   source = "../../../modules/alb"
 
-  project_name = var.project_name
-  environment  = var.environment
+  name_prefix = local.name
 
   vpc_id     = var.vpc_id
   subnet_ids = var.public_subnet_ids
@@ -19,7 +18,6 @@ module "alb_api" {
   ]
 
   tags = {
-    Project     = var.project_name
     Environment = var.environment
     Owner       = var.owner
     Service     = "api"

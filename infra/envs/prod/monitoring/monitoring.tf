@@ -1,12 +1,12 @@
 module "monitoring_task" {
   source = "../../../modules/ecs-task"
 
-  name = "${var.project_name}-${var.environment}-monitoring"
+  name = local.name
 
   cpu    = 1024
   memory = 2048
 
-  container_image = "${module.ecr_monitoring.repository_url}:monitoring-latest"
+  container_image = "${module.ecr_monitoring.repository_url}:${local.container_name}-latest"
 
   cluster_arn        = var.ecs_cluster_arn
   execution_role_arn = module.iam_monitoring.execution_role_arn

@@ -3,7 +3,7 @@ module "ecr_model" {
 
   project_name  = var.project_name
   environment   = var.environment
-  service_name  = "model"
+  service_name  = local.component
 
   image_mutability = "MUTABLE"
   scan_on_push     = true

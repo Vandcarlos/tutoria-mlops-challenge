@@ -5,6 +5,6 @@
 module "mlflow_task_iam" {
   source = "../iam"
 
-  name_prefix   = local.name_prefix
+  name_prefix   = local.name
   s3_bucket_arn = var.mlflow_artifact_bucket_arn
 }

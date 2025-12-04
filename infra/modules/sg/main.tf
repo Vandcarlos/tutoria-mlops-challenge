@@ -14,7 +14,7 @@ terraform {
 }
 
 resource "aws_security_group" "this" {
-  name        = local.sg_name
+  name        = local.name
   description = "Application security group for ${var.name_prefix}"
   vpc_id      = var.vpc_id
 

@@ -3,7 +3,7 @@ module "ecr_api" {
 
   project_name  = var.project_name
   environment   = var.environment
-  service_name  = "api"
+  service_name  = local.name
 
   image_mutability = "MUTABLE"
   scan_on_push     = true

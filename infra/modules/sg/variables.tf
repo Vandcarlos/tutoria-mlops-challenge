@@ -2,7 +2,7 @@
 // Public interface for the generic application security group module.
 
 variable "name_prefix" {
-  description = "Prefix used to name the security group (e.g. tutoria-mlops-prod-mlflow)"
+  description = "Prefix used to name the security group (e.g. mlflow)"
   type        = string
 }
 

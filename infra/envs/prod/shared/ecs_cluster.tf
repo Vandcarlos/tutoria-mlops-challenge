@@ -3,7 +3,6 @@ module "ecs_cluster" {
 
   project_name              = var.project_name
   environment               = var.environment
-  aws_region                = var.aws_region
   enable_container_insights = true
 
   tags = {

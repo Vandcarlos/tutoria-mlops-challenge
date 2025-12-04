@@ -13,7 +13,7 @@ output "alb_dns_name" {
 
 output "security_group_id" {
   description = "Security group ID associated with the ALB"
-  value       = aws_security_group.alb_sg.id
+  value       = module.sg_alb.security_group_id
 }
 
 output "target_group_arn" {
