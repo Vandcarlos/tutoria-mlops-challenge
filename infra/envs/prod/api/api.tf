@@ -19,9 +19,9 @@ module "api_service" {
   desired_count    = 1
   target_group_arn = module.alb_api.target_group_arn
 
-  task_role_arn      = module.mlflow_task_iam.task_role_arn
-  execution_role_arn = module.mlflow_task_iam.execution_role_arn
-  log_group_name     = module.mlflow_logs.log_group_name
+  task_role_arn      = module.iam_api.task_role_arn
+  execution_role_arn = module.iam_api.execution_role_arn
+  log_group_name     = module.logs_api.log_group_name
   log_group_region   = var.aws_region
   assign_public_ip   = false
 
