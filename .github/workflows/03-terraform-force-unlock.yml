@@ -1,0 +1,53 @@
+name: Terraform Force Unlock
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  unlock:
+    if: startsWith(github.event.issue.title, 'TF UNLOCK:')
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+
+    steps:
+      - name: Extract LOCK ID from issue
+        id: parse
+        run: |
+          LOCK_ID=$(echo "${{ github.event.issue.title }}" | sed 's/TF UNLOCK: //')
+          echo "lock_id=${LOCK_ID}" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: infra/envs/prod
+        run: terraform init -input=false
+
+      - name: Terraform Force Unlock
+        working-directory: infra/envs/prod
+        run: terraform force-unlock -force ${{ steps.parse.outputs.lock_id }}
+
+      - name: Comment on issue
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ✅ Terraform lock **${{ steps.parse.outputs.lock_id }}** foi removido com sucesso!
+            O state está liberado para novos plans/applies.
+
+      - name: Close Issue
+        uses: peter-evans/close-issue@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment: "Issue fechada automaticamente após executar o force-unlock."
