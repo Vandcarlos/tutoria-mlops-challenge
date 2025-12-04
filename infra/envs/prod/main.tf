@@ -12,7 +12,6 @@ module "mlflow_env" {
   owner        = var.owner
   project_name = var.project_name
   environment  = var.environment
-  aws_region   = var.aws_region
 
   vpc_id             = module.shared_env.vpc_id
   private_subnet_ids = module.shared_env.private_subnet_ids
@@ -35,7 +34,6 @@ module "model_env" {
   owner        = var.owner
   project_name = var.project_name
   environment  = var.environment
-  aws_region   = var.aws_region
 
   ecs_cluster_arn = module.shared_env.ecs_cluster_arn
 
@@ -49,7 +47,6 @@ module "monitoring_env" {
   owner        = var.owner
   project_name = var.project_name
   environment  = var.environment
-  aws_region   = var.aws_region
 
   ecs_cluster_arn = module.shared_env.ecs_cluster_arn
 
@@ -64,7 +61,6 @@ module "api_env" {
   owner        = var.owner
   project_name = var.project_name
   environment  = var.environment
-  aws_region   = var.aws_region
 
   vpc_id             = module.shared_env.vpc_id
   private_subnet_ids = module.shared_env.private_subnet_ids

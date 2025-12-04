@@ -1,4 +1,4 @@
-module "ecr_training" {
+module "ecr_monitoring" {
   source = "../../../modules/ecr"
 
   project_name  = var.project_name

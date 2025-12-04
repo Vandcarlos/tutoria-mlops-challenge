@@ -1,31 +1,25 @@
-data "aws_caller_identity" "current" {}
-
-locals {
-  aws_account_id = data.aws_caller_identity.current.account_id
-}
-
-module "model_training_task" {
+module "model_task" {
   source = "../../../modules/ecs-task"
 
-  name = "${var.project_name}-${var.environment}-model-training"
+  name = "${var.project_name}-${var.environment}-model-model"
 
   cpu    = 1024
   memory = 2048
 
-  container_image = "${module.ecr_training.repository_url}:model-latest"
+  container_image = "${module.ecr_model.repository_url}:model-latest"
 
   cluster_arn        = var.ecs_cluster_arn
   execution_role_arn = module.iam_model.execution_role_arn
   task_role_arn      = module.iam_model.task_role_arn
 
-  log_group_name = "/ecs/${var.project_name}/${var.environment}/model-training"
+  log_group_name     = module.logs_model.log_group_name
 
   environment = {
     ENVIRONMENT = var.environment
-    AWS_REGION  = var.aws_region
+    AWS_REGION  = local.aws_region
 
     MLFLOW_TRACKING_URI    = var.mlflow_tracking_uri
-    MLFLOW_EXPERIMENT_NAME = "amazon-reviews-training"
+    MLFLOW_EXPERIMENT_NAME = "amazon-reviews-model"
     S3_DATA_BUCKET         = var.data_bucket_name
   }
 }

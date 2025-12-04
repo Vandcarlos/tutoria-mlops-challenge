@@ -74,11 +74,6 @@ variable "log_group_name" {
   type        = string
 }
 
-variable "log_group_region" {
-  description = "AWS region where the CloudWatch Logs group is created"
-  type        = string
-}
-
 variable "assign_public_ip" {
   description = "Whether to assign a public IP to the tasks' ENIs"
   type        = bool
@@ -86,12 +81,9 @@ variable "assign_public_ip" {
 }
 
 variable "environment" {
-  description = "Environment variables injected into the container"
-  type = list(object({
-    name  = string
-    value = string
-  }))
-  default = []
+  description = "Environment variables for the container"
+  type        = map(string)
+  default     = {}
 }
 
 variable "platform_version" {

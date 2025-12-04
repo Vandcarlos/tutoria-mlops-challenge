@@ -22,33 +22,14 @@ module "api_service" {
   task_role_arn      = module.iam_api.task_role_arn
   execution_role_arn = module.iam_api.execution_role_arn
   log_group_name     = module.logs_api.log_group_name
-  log_group_region   = var.aws_region
   assign_public_ip   = false
 
-  environment = [
-	  {
-	    name  = "ENVIRONMENT"
-	    value = var.environment
-	  },
-	  {
-	    name  = "AWS_REGION"
-	    value = var.aws_region
-	  },
-	  {
-	    name  = "MLFLOW_TRACKING_URI"
-	    value = var.mlflow_tracking_uri
-	  },
-	  {
-	    name  = "MLFLOW_EXPERIMENT_NAME"
-	    value = "amazon-reviews-training"
-	  },
-	  {
-	    name  = "S3_DATA_BUCKET"
-	    value = var.data_bucket_name
-	  },
-	  {
-	    name  = "ALLOW_RUNTIME_MODEL_DOWNLOAD"
-	    value = true
-	  },
-	]
+  environment = {
+    ENVIRONMENT                  = var.environment
+    AWS_REGION                   = local.aws_region
+    MLFLOW_TRACKING_URI          = var.mlflow_tracking_uri
+    MLFLOW_EXPERIMENT_NAME       = "amazon-reviews-api"
+    S3_DATA_BUCKET               = var.data_bucket_name
+    ALLOW_RUNTIME_MODEL_DOWNLOAD = true
+  }
 }

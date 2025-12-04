@@ -1,12 +1,3 @@
-resource "aws_cloudwatch_log_group" "this" {
-  name              = var.log_group_name
-  retention_in_days = 30
-
-  tags = {
-    Name = "${var.name}-logs"
-  }
-}
-
 resource "aws_ecs_task_definition" "this" {
   family                   = var.name
   requires_compatibilities = ["FARGATE"]
@@ -36,12 +27,10 @@ resource "aws_ecs_task_definition" "this" {
         logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.this.name
-          awslogs-region        = data.aws_region.current.name
+          awslogs-region        = local.aws_region
           awslogs-stream-prefix = var.name
         }
       }
     }
   ])
 }
-
-data "aws_region" "current" {}
