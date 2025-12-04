@@ -11,7 +11,14 @@ from sklearn.pipeline import Pipeline
 
 import mlflow
 from src.model import config as cfg
+from src.model.config import (
+    DATASET_BATCH_ITEM_PATH,
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_PROCESSED_ITEM,
+    USE_S3_DATA,
+)
 from src.model.utilities.metrics_helper import validate
+from src.shared.s3_utils import download_file_from_s3
 
 
 def _generate_tokeninzer_tfidf() -> TfidfVectorizer:
@@ -58,7 +65,15 @@ def _get_train_data_frame(batches: list[int]) -> pd.DataFrame:
     dfs: list[pd.DataFrame] = []
 
     for batch in batches:
-        batch_path = cfg.DATASET_PROCESSED_PATH / f"train_batch_{batch}.parquet"
+        batch_path = DATASET_BATCH_ITEM_PATH(batch_idx=batch)
+
+        if USE_S3_DATA:
+            download_file_from_s3(
+                bucket=S3_DATA_BUCKET,
+                key=S3_DATA_KEY_PROCESSED_ITEM(batch_idx=batch),
+                file_path=batch_path,
+            )
+
         batch_df = pd.read_parquet(path=batch_path)
         dfs.append(batch_df)
         print(f"[TRAIN] Loaded batch {batch}: {batch_path} ({len(batch_df)} rows)")

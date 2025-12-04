@@ -3,7 +3,14 @@ import json
 
 import pandas as pd
 
-from src.monitoring.config import MONITORING_BASE_PATH, MONITORING_LOOKBACK_DAYS
+from src.monitoring.config import (
+    MONITORING_BASE_PATH,
+    MONITORING_LOOKBACK_DAYS,
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_MONITORING_PREDICTIONS,
+    USE_S3_DATA,
+)
+from src.shared.s3_utils import download_file_from_s3
 
 
 def load_prediction_logs_local() -> pd.DataFrame:
@@ -12,6 +19,13 @@ def load_prediction_logs_local() -> pd.DataFrame:
     It expects files under:
         monitoring/predictions/date=YYYY-MM-DD/prediction_<uuid>.json
     """
+
+    if USE_S3_DATA:
+        download_file_from_s3(
+            bucket=S3_DATA_BUCKET,
+            key=S3_DATA_KEY_MONITORING_PREDICTIONS,
+            file_path=MONITORING_BASE_PATH,
+        )
 
     if not MONITORING_BASE_PATH.exists():
         return pd.DataFrame()

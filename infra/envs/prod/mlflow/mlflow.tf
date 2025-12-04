@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 locals {
   mlflow_backend_store_uri = "postgresql+psycopg2://${module.mlflow_db.username}:${var.mlflow_db_password}@${module.mlflow_db.endpoint}:${module.mlflow_db.port}/${module.mlflow_db.db_name}"
   mlflow_artifact_root     = "s3://${module.mlflow_artifacts_bucket.bucket_name}"
-  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_account_id           = data.aws_caller_identity.current.account_id
 }
 
 module "mlflow" {
@@ -25,7 +25,8 @@ module "mlflow" {
   mlflow_artifact_root       = local.mlflow_artifact_root
   mlflow_artifact_bucket_arn = module.mlflow_artifacts_bucket.bucket_arn
 
-  container_image = "${local.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.project_name}/${var.environment}/mlflow:mlflow-latest"
+  container_image = "${module.ecr_mlflow.repository_url}:mlflow-latest"
+
   container_cpu    = 512
   container_memory = 1024
   desired_count    = 1

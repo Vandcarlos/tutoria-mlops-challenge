@@ -49,3 +49,32 @@ jobs:
       image-tag: "mlflow-ci-test"
       test-port: 5000
       healthcheck-path: "/"
+
+  docker-model-test:
+    name: Docker Test - Model
+    needs: [lint, tests]
+    uses: ./.github/workflows/_reusable-docker-test.yml
+    with:
+      dockerfile: "docker/model.Dockerfile"
+      context: "."
+      image-tag: "model-ci-test"
+
+  docker-api-test:
+    name: Docker Test - API
+    needs: [lint, tests]
+    uses: ./.github/workflows/_reusable-docker-test.yml
+    with:
+      dockerfile: "docker/api.Dockerfile"
+      context: "."
+      image-tag: "api-ci-test"
+      #test-port: 8000
+      #healthcheck-path: "/health"
+
+  docker-monitoring-test:
+    name: Docker Test - Monitoring
+    needs: [lint, tests]
+    uses: ./.github/workflows/_reusable-docker-test.yml
+    with:
+      dockerfile: "docker/monitoring.Dockerfile"
+      context: "."
+      image-tag: "monitoring-ci-test"

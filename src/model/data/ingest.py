@@ -11,7 +11,12 @@ from src.model.config import (
     KAGGLE_DATASET_NAME,
     KAGGLE_DATASET_TEST_FILENAME,
     KAGGLE_DATASET_TRAIN_FILENAME,
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_RAW_TEST,
+    S3_DATA_KEY_RAW_TRAIN,
+    USE_S3_DATA,
 )
+from src.shared.s3_utils import upload_file_to_s3
 
 
 def ingest() -> dict:
@@ -41,12 +46,26 @@ def ingest() -> dict:
     print(f"[INGEST] train → {DATASET_RAW_TRAIN_PARQUET}")
     print(f"[INGEST] test  → {DATASET_RAW_TEST_PARQUET}")
 
-    return {
+    output = {
         "train_path": DATASET_RAW_TRAIN_PARQUET,
         "test_path": DATASET_RAW_TEST_PARQUET,
         "train_rows": train_rows,
         "test_rows": test_rows,
     }
+
+    if USE_S3_DATA:
+        upload_file_to_s3(
+            DATASET_RAW_TRAIN_PARQUET,
+            bucket=S3_DATA_BUCKET,
+            key=S3_DATA_KEY_RAW_TRAIN,
+        )
+        upload_file_to_s3(
+            DATASET_RAW_TEST_PARQUET,
+            bucket=S3_DATA_BUCKET,
+            key=S3_DATA_KEY_RAW_TEST,
+        )
+
+    return output
 
 
 def main():

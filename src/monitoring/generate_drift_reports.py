@@ -1,3 +1,4 @@
+import botocore.exceptions
 from evidently import Report
 from evidently.presets import DataDriftPreset
 import pandas as pd
@@ -7,9 +8,14 @@ from src.monitoring.config import (
     MONITORING_OUTPUT_PATH,
     MONITORING_REPORT_PATH,
     REFERENCE_PREDICTIONS_PATH,
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_MONITORING_REFERENCE,
+    S3_DATA_KEY_MONITORING_REPORTS_ITEM,
+    USE_S3_DATA,
 )
 from src.monitoring.generate_reference_predictions import generate_reference_predictions
 from src.monitoring.log_loader import load_prediction_logs_local
+from src.shared.s3_utils import download_file_from_s3, upload_file_to_s3
 
 
 def load_reference_predictions() -> pd.DataFrame:
@@ -19,6 +25,22 @@ def load_reference_predictions() -> pd.DataFrame:
     - run the model on validation data
     - store predicted_label and confidence in a parquet file
     """
+
+    if USE_S3_DATA:
+        try:
+            download_file_from_s3(
+                bucket=S3_DATA_BUCKET,
+                key=S3_DATA_KEY_MONITORING_REFERENCE,
+                file_path=REFERENCE_PREDICTIONS_PATH,
+            )
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code in ("404", "NoSuchKey"):
+                print(
+                    f"[S3] Reference file not found in bucket, skipping: s3://{S3_DATA_BUCKET}/{S3_DATA_KEY_MONITORING_REFERENCE}"
+                )
+            else:
+                raise
 
     if not REFERENCE_PREDICTIONS_PATH.exists():
         generate_reference_predictions()
@@ -60,6 +82,13 @@ def build_prediction_drift_report(
 
     MONITORING_REPORT_PATH.touch(exist_ok=True)
     snapshot.save_html(str(MONITORING_REPORT_PATH))
+
+    if USE_S3_DATA:
+        upload_file_to_s3(
+            file_path=MONITORING_REPORT_PATH,
+            bucket=S3_DATA_BUCKET,
+            key=S3_DATA_KEY_MONITORING_REPORTS_ITEM,
+        )
 
     return MONITORING_REPORT_PATH
 

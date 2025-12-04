@@ -31,3 +31,11 @@ ALLOW_RUNTIME_MODEL_DOWNLOAD: bool = _bool(
     "ALLOW_RUNTIME_MODEL_DOWNLOAD",
     default=(ENVIRONMENT == "local"),
 )
+
+# Optional S3 data storage configuration
+
+S3_DATA_BUCKET: str | None = os.getenv("S3_DATA_BUCKET")
+USE_S3_DATA: bool = S3_DATA_BUCKET is not None
+
+S3_DATA_KEY_PREFIX: str = os.getenv("S3_DATA_PREFIX", "amazon-reviews")
+S3_DATA_KEY_MONITORING = f"{S3_DATA_KEY_PREFIX}/monitoring/predictions"

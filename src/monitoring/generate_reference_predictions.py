@@ -9,15 +9,25 @@ from src.monitoring.config import (
     ALLOW_RUNTIME_MODEL_DOWNLOAD,
     MODEL_PATH,
     REFERENCE_PREDICTIONS_PATH,
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_MONITORING_REFERENCE,
+    S3_DATA_KEY_TEST_DATA,
     TEST_DATA_PATH,
     TEST_FULL_TEXT_COLUMN,
+    USE_S3_DATA,
 )
 from src.shared.model_resolver import load_model
+from src.shared.s3_utils import download_file_from_s3, upload_file_to_s3
 
 
 def load_validation_dataset() -> pd.DataFrame:
     """Load the validation dataset from parquet or CSV."""
     print(f"[reference] Loading validation dataset from: {TEST_DATA_PATH}")
+
+    if USE_S3_DATA:
+        download_file_from_s3(
+            bucket=S3_DATA_BUCKET, key=S3_DATA_KEY_TEST_DATA, file_path=TEST_DATA_PATH
+        )
 
     if not TEST_DATA_PATH.exists():
         raise FileNotFoundError(f"Validation dataset not found: {TEST_DATA_PATH}")
@@ -71,6 +81,13 @@ def generate_reference_predictions() -> Path:
     REFERENCE_PREDICTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     reference_df.to_parquet(REFERENCE_PREDICTIONS_PATH)
+
+    if USE_S3_DATA:
+        upload_file_to_s3(
+            file_path=REFERENCE_PREDICTIONS_PATH,
+            bucket=S3_DATA_BUCKET,
+            key=S3_DATA_KEY_MONITORING_REFERENCE,
+        )
 
     print(f"[reference] Saved reference predictions to: {REFERENCE_PREDICTIONS_PATH}")
     return REFERENCE_PREDICTIONS_PATH

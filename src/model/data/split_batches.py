@@ -8,10 +8,21 @@ from src.model.config import (
     DATASET_BATCH_PATH,
     DATASET_RAW_TRAIN_PARQUET,
     DATASET_SPLIT_COUNT,
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_BATCH_ITEM,
+    S3_DATA_KEY_RAW_TRAIN,
+    USE_S3_DATA,
 )
+from src.shared.s3_utils import download_file_from_s3, upload_file_to_s3
 
 
 def split_raw_train() -> dict[str:any]:
+    if USE_S3_DATA:
+        download_file_from_s3(
+            file_path=DATASET_RAW_TRAIN_PARQUET,
+            bucket=S3_DATA_BUCKET,
+            key=S3_DATA_KEY_RAW_TRAIN,
+        )
     DATASET_BATCH_PATH.mkdir(parents=True, exist_ok=True)
 
     if not DATASET_RAW_TRAIN_PARQUET.exists():
@@ -35,6 +46,13 @@ def split_raw_train() -> dict[str:any]:
 
         outputs.append(out)
         print(f"[SPLIT_RAW] batch_{i}: {start} → {end} rows → {out}")
+
+        if USE_S3_DATA:
+            upload_file_to_s3(
+                file_path=out,
+                bucket=S3_DATA_BUCKET,
+                key=S3_DATA_KEY_BATCH_ITEM(batch_idx=i),
+            )
 
     return {
         "input_path": DATASET_RAW_TRAIN_PARQUET,

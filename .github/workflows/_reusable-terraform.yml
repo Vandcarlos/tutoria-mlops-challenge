@@ -54,7 +54,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         run: terraform validate
 
-      - name: Terraform plan (for apply, using tfvars)
+      - name: Terraform plan
         working-directory: ${{ inputs.working-directory }}
         env:
           TF_VAR_mlflow_db_password: ${{ secrets.mlflow-db-password }}

@@ -3,6 +3,12 @@ import json
 import uuid
 
 import src.api.config as cfg
+from src.api.config import (
+    S3_DATA_BUCKET,
+    S3_DATA_KEY_MONITORING,
+    USE_S3_DATA,
+)
+from src.shared.s3_utils import upload_file_to_s3
 
 
 class LocalPredictionLogger:
@@ -53,3 +59,8 @@ class LocalPredictionLogger:
 
         file_path = dir_path / f"prediction_{request_id}.json"
         file_path.write_text(json.dumps(event), encoding="utf-8")
+
+        if USE_S3_DATA:
+            upload_file_to_s3(
+                file_path=file_path, bucket=S3_DATA_BUCKET, key=S3_DATA_KEY_MONITORING
+            )

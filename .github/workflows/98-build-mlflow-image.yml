@@ -1,12 +1,6 @@
-name: 03 - Build & Push MLflow Image
+name: 98 - Build & Push MLflow Image
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "docker/mlflow.Dockerfile"
-      - ".github/workflows/03-build-mlflow-image.yml"
   workflow_dispatch: {}
 
 permissions:
