@@ -7,17 +7,15 @@ module "alb_mlflow" {
   vpc_id     = var.vpc_id
   subnet_ids = var.public_subnet_ids
 
-  # Para o MLflow, vamos expor direto na porta 5000 (externo = interno)
   internal              = false
-  listener_port         = 5000
+  listener_port         = 80
   listener_protocol     = "HTTP"
   target_group_port     = 5000
   target_group_protocol = "HTTP"
   health_check_path     = "/"
 
-  # Em prod, idealmente restringir isso pro seu IP/office/VPN
   allowed_ingress_cidrs = [
-    "0.0.0.0/0" # temporariamente; depois você troca por seu /32 ou VPN
+    "0.0.0.0/0"
   ]
 
   tags = {

@@ -1,0 +1,12 @@
+.venv
+.git
+.gitignore
+__pycache__
+tests
+notebooks
+.airflow
+mlruns
+data
+.env
+.env.*
+*.log

@@ -6,9 +6,7 @@ networks:
 x-airflow-common: &airflow-common
   build:
     context: ..
-    dockerfile: ./airflow/Dockerfile
-    args:
-      AIRFLOW_IMAGE: ${AIRFLOW_IMAGE}
+    dockerfile: ./docker/airflow.Dockerfile
   env_file:
     - .env
   environment:

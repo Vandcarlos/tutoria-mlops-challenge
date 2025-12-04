@@ -1,0 +1,91 @@
+name: Reusable - Build and Push Docker Image to ECR
+
+on:
+  workflow_call:
+    inputs:
+      ecr-repository:
+        description: "ECR repository name (without registry), e.g. tutoria-mlops-challenge/prod/mlflow"
+        required: true
+        type: string
+      dockerfile:
+        description: "Path to Dockerfile"
+        required: true
+        type: string
+      context:
+        description: "Build context"
+        required: false
+        default: "."
+        type: string
+      image-tag-suffix:
+        description: "Suffix for the image tag, e.g. mlflow / api / training"
+        required: true
+        type: string
+    secrets:
+      aws-infra-role-arn:
+        description: "ARN of the oc-infra-deployer role"
+        required: true
+      aws-region:
+        description: "AWS region"
+        required: true
+
+jobs:
+  build-and-push:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.aws-infra-role-arn }}
+          aws-region: ${{ secrets.aws-region }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        env:
+          AWS_REGION: ${{ inputs.aws-region }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ inputs.ecr-repository }}
+          DOCKERFILE_PATH: ${{ inputs.dockerfile }}
+          BUILD_CONTEXT: ${{ inputs.context }}
+          IMAGE_TAG_SUFFIX: ${{ inputs.image-tag-suffix }}
+        run: |
+          # Build image tags
+          GIT_SHA_TAG=${GITHUB_SHA::7}
+
+          IMAGE_TAG_SHA="${IMAGE_TAG_SUFFIX}-${GIT_SHA_TAG}"
+          IMAGE_TAG_LATEST="${IMAGE_TAG_SUFFIX}-latest"
+
+          echo "Building image:"
+          echo "  Registry:   $ECR_REGISTRY"
+          echo "  Repository: $ECR_REPOSITORY"
+          echo "  Tags:       $IMAGE_TAG_SHA, $IMAGE_TAG_LATEST"
+          echo "  Dockerfile: $DOCKERFILE_PATH"
+          echo "  Context:    $BUILD_CONTEXT"
+
+          # Build image with both tags
+          docker build \
+            -f "$DOCKERFILE_PATH" \
+            -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_SHA" \
+            -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_LATEST" \
+            "$BUILD_CONTEXT"
+
+          # Push both tags
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_SHA"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_LATEST"
+
+      - name: Output image URIs
+        run: |
+          echo "Image pushed to:"
+          echo "  $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_SHA"
+          echo "  $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_LATEST"

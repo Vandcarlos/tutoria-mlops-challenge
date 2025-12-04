@@ -1,0 +1,12 @@
+name: "Terraform Force Unlock"
+description: "Use this template to unlock a stuck Terraform state."
+title: "TF UNLOCK: <LOCK_ID>"
+body:
+  - type: input
+    id: lock_id
+    attributes:
+      label: "Lock ID"
+      description: "Paste the LOCK ID exactly as shown in the error message."
+      placeholder: "04764d88-9f0c-ffe2-477b-5f465b4da1e0"
+    validations:
+      required: true

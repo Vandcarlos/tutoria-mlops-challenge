@@ -1,0 +1,69 @@
+name: Reusable - Docker Image Test
+
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        description: "Path to Dockerfile"
+        required: true
+        type: string
+      context:
+        description: "Build context"
+        required: false
+        default: "."
+        type: string
+      image-tag:
+        description: "Local image tag for CI test"
+        required: false
+        default: "ci-docker-test"
+        type: string
+      test-port:
+        description: "Port that the container exposes for HTTP test"
+        required: true
+        type: number
+      healthcheck-path:
+        description: "Path to call for healthcheck (e.g. /, /health)"
+        required: false
+        default: "/"
+        type: string
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image for test
+        env:
+          DOCKERFILE_PATH: ${{ inputs.dockerfile }}
+          BUILD_CONTEXT: ${{ inputs.context }}
+          IMAGE_TAG: ${{ inputs.image-tag }}
+        run: |
+          echo "Building image $IMAGE_TAG from $DOCKERFILE_PATH with context $BUILD_CONTEXT"
+          docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" "$BUILD_CONTEXT"
+
+      - name: Run container and HTTP healthcheck
+        env:
+          IMAGE_TAG: ${{ inputs.image-tag }}
+          TEST_PORT: ${{ inputs.test-port }}
+          HEALTHCHECK_PATH: ${{ inputs.healthcheck-path }}
+        run: |
+          echo "Starting container from image $IMAGE_TAG"
+          CONTAINER_ID=$(docker run -d -p ${TEST_PORT}:${TEST_PORT} "$IMAGE_TAG")
+          echo "Container: $CONTAINER_ID"
+
+          echo "Waiting container to be ready..."
+          sleep 10
+
+          echo "Calling healthcheck endpoint http://localhost:${TEST_PORT}${HEALTHCHECK_PATH}"
+          if ! curl -f "http://localhost:${TEST_PORT}${HEALTHCHECK_PATH}"; then
+            echo "Healthcheck failed. Container logs:"
+            docker logs "$CONTAINER_ID" || true
+            docker rm -f "$CONTAINER_ID" || true
+            exit 1
+          fi
+
+          docker rm -f "$CONTAINER_ID" || true
+          echo "Container test passed successfully!"
