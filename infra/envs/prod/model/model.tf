@@ -12,7 +12,7 @@ module "model_task" {
   execution_role_arn = module.iam_model.execution_role_arn
   task_role_arn      = module.iam_model.task_role_arn
 
-  log_group_name     = module.logs_api.log_group_name
+  log_group_name     = module.logs_model.log_group_name
 
   environment = {
     ENVIRONMENT = var.environment
