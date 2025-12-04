@@ -1,4 +1,4 @@
-name: Build & Push MLflow Image
+name: 03 - Build & Push MLflow Image
 
 on:
   push:
@@ -8,6 +8,10 @@ on:
       - "docker/mlflow.Dockerfile"
       - ".github/workflows/03-build-mlflow-image.yml"
   workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   build-mlflow:
