@@ -39,3 +39,14 @@ jobs:
       aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
       aws-region: ${{ secrets.AWS_REGION }}
       mlflow-db-password: ${{ secrets.MLFLOW_DB_PASSWORD }}
+
+  docker-mlflow-test:
+    name: Docker Test - MLflow
+    needs: [lint, tests]
+    uses: ./.github/workflows/_reusable-docker-test.yml
+    with:
+      dockerfile: "docker/mlflow.Dockerfile"
+      context: "."
+      image-tag: "mlflow-ci-test"
+      test-port: 5000
+      healthcheck-path: "/"
