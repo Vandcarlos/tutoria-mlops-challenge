@@ -1,7 +1,7 @@
 module "mlflow_artifacts_bucket" {
   source = "../../../modules/s3-bucket"
 
-  bucket_name        = "tutoria-mlops-prod-mlflow-artifacts" # precisa ser único globalmente
+  bucket_name        = "tutoria-mlops-prod-mlflow-artifacts"
   versioning_enabled = true
   force_destroy      = false
 

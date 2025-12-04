@@ -1,9 +1,9 @@
-module "ecr_mlflow" {
+module "ecr_api" {
   source = "../../../modules/ecr"
 
   project_name  = var.project_name
   environment   = var.environment
-  service_name  = "mlflow"
+  service_name  = "api"
 
   image_mutability = "MUTABLE"
   scan_on_push     = true

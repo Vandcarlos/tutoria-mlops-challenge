@@ -18,6 +18,18 @@ DATASET_SPLIT_COUNT = int(os.getenv("DATASET_SPLIT_COUNT", "10"))
 
 MLFLOW_MODEL_NAME: str = os.getenv("MLFLOW_MODEL_NAME", "sentiment-logreg-tfidf")
 
+# Optional S3 data storage configuration
+S3_DATA_BUCKET: str | None = os.getenv("S3_DATA_BUCKET")
+USE_S3_DATA: bool = S3_DATA_BUCKET is not None
+
+S3_DATA_KEY_PREFIX: str = os.getenv("S3_DATA_PREFIX", "amazon-reviews")
+S3_DATA_KEY_RAW = f"{S3_DATA_KEY_PREFIX}/raw"
+S3_DATA_KEY_RAW_TRAIN = f"{S3_DATA_KEY_RAW}/train.parquet"
+S3_DATA_KEY_RAW_TEST = f"{S3_DATA_KEY_RAW}/test.parquet"
+S3_DATA_KEY_BATCH = f"{S3_DATA_KEY_PREFIX}/batches"
+S3_DATA_KEY_PROCESSED = f"{S3_DATA_KEY_PREFIX}/processed"
+S3_DATA_KEY_PROCESSED_TEST = f"{S3_DATA_KEY_PREFIX}/test.parquet"
+
 # Constants
 
 KAGGLE_DATASET_NAME = "kritanjalijain/amazon-reviews"
@@ -62,3 +74,11 @@ def DATASET_BATCH_ITEM_PATH(batch_idx: int) -> Path:
 
 def DATASET_PROCESSED_BATCH_ITEM_PATH(batch_idx: int) -> Path:
     return DATASET_PROCESSED_PATH / f"train_batch_{batch_idx}.parquet"
+
+
+def S3_DATA_KEY_BATCH_ITEM(batch_idx: int) -> Path:
+    return f"{S3_DATA_KEY_BATCH}/train_batch_{batch_idx}.parquet"
+
+
+def S3_DATA_KEY_PROCESSED_ITEM(batch_idx: int) -> Path:
+    return f"{S3_DATA_KEY_PROCESSED}/train_batch_{batch_idx}.parquet"

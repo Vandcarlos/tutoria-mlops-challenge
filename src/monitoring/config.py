@@ -31,3 +31,19 @@ TEST_DATA_PATH = Path(
 ).resolve()
 TEST_FULL_TEXT_COLUMN = "full_text"
 MODEL_PATH: Path = Path(os.getenv("MODEL_PATH", "./data/model")).resolve()
+
+# Optional S3 data storage configuration
+S3_DATA_BUCKET: str | None = os.getenv("S3_DATA_BUCKET")
+USE_S3_DATA: bool = S3_DATA_BUCKET is not None
+
+S3_DATA_KEY_PREFIX: str = os.getenv("S3_DATA_PREFIX", "amazon-reviews")
+S3_DATA_KEY_MONITORING = f"{S3_DATA_KEY_PREFIX}/monitoring"
+S3_DATA_KEY_MONITORING_PREDICTIONS = f"{S3_DATA_KEY_MONITORING}/predictions"
+S3_DATA_KEY_MONITORING_REPORTS = f"{S3_DATA_KEY_MONITORING}/reports"
+S3_DATA_KEY_MONITORING_REPORTS_ITEM = (
+    f"{S3_DATA_KEY_MONITORING_REPORTS}/prediction_drift_report.html"
+)
+S3_DATA_KEY_MONITORING_REFERENCE = (
+    f"{S3_DATA_KEY_MONITORING}/reference_predictions.parquet"
+)
+S3_DATA_KEY_TEST_DATA = f"{S3_DATA_KEY_PREFIX}/processed/test.parquet"

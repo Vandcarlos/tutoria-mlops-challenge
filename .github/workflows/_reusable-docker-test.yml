@@ -19,7 +19,8 @@ on:
         type: string
       test-port:
         description: "Port that the container exposes for HTTP test"
-        required: true
+        required: false
+        default: 0
         type: number
       healthcheck-path:
         description: "Path to call for healthcheck (e.g. /, /health)"
@@ -45,6 +46,7 @@ jobs:
           docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" "$BUILD_CONTEXT"
 
       - name: Run container and HTTP healthcheck
+        if: ${{ inputs.test-port != 0 }}
         env:
           IMAGE_TAG: ${{ inputs.image-tag }}
           TEST_PORT: ${{ inputs.test-port }}
