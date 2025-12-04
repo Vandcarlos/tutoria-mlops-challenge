@@ -1,4 +1,4 @@
-name: Terraform Force Unlock
+name: Infra - Terraform Force Unlock
 
 on:
   issues:
