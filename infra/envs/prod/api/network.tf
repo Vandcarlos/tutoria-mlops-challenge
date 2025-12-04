@@ -7,6 +7,6 @@ module "sg_api" {
 
   name_prefix         = local.name_prefix
   vpc_id              = var.vpc_id
-  app_port            = var.container_port
+  app_port            = 8000
   ingress_from_sg_ids = [module.alb_api.security_group_id]
 }
