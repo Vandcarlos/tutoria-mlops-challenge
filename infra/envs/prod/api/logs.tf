@@ -2,7 +2,7 @@
 // Bindings to the generic logs-cloudwatch module.
 // Responsible for creating a CloudWatch Logs group for the MLflow ECS service.
 
-module "mlflow_logs" {
+module "logs_api" {
   source = "../../../modules/logs-cloudwatch"
 
   log_group_name    = local.log_group_name
