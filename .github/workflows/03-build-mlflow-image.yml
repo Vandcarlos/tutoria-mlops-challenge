@@ -1,0 +1,22 @@
+name: Build & Push MLflow Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docker/mlflow.Dockerfile"
+      - ".github/workflows/03-build-mlflow-image.yml"
+  workflow_dispatch: {}
+
+jobs:
+  build-mlflow:
+    uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
+    with:
+      ecr-repository: "tutoria-mlops-challenge/prod/mlflow"
+      dockerfile: "docker/mlflow.Dockerfile"
+      context: "."
+      image-tag-suffix: "mlflow"
+    secrets:
+      aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}

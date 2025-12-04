@@ -1,5 +1,4 @@
-ARG AIRFLOW_IMAGE=apache/airflow:2.9.1
-FROM ${AIRFLOW_IMAGE}
+FROM apache/airflow:2.9.1
 
 # Default user in the base image is already "airflow",
 # but we set explicitly to be clear
