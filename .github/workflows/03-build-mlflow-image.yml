@@ -9,6 +9,10 @@ on:
       - ".github/workflows/03-build-mlflow-image.yml"
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-mlflow:
     uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
