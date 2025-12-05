@@ -4,7 +4,15 @@ locals {
   component = "mlflow"
   name      = "${local.component}-${var.environment}"
 
-  mlflow_backend_store_uri = "postgresql+psycopg2://${module.mlflow_db.username}:${var.mlflow_db_password}@${module.mlflow_db.endpoint}:${module.mlflow_db.port}/${module.mlflow_db.db_name}"
-  mlflow_artifact_root     = "s3://${module.mlflow_artifacts_bucket.bucket_name}"
-  aws_account_id           = data.aws_caller_identity.current.account_id
+  mlflow_backend_store_uri = format(
+    "postgresql+psycopg2://%s:%s@%s:%d/%s",
+    module.mlflow_db.username, # "mlflow_user"
+    var.mlflow_db_password,    # password from TF var / secret
+    module.mlflow_db.endpoint, # RDS hostname
+    module.mlflow_db.port,     # usually 5432
+    module.mlflow_db.db_name   # "mlflow"
+  )
+
+  mlflow_artifact_root = "s3://${module.mlflow_artifacts_bucket.bucket_name}"
+  aws_account_id       = data.aws_caller_identity.current.account_id
 }

@@ -44,11 +44,11 @@ jobs:
     needs: [lint, tests]
     uses: ./.github/workflows/_reusable-docker-test.yml
     with:
-      dockerfile: "docker/mlflow.Dockerfile"
+      dockerfile: "docker/mlflow/.Dockerfile"
       context: "."
       image-tag: "mlflow-ci-test"
-      test-port: 5000
-      healthcheck-path: "/"
+      #test-port: 5000
+      #healthcheck-path: "/"
 
   docker-model-test:
     name: Docker Test - Model

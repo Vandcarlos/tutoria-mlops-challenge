@@ -33,3 +33,8 @@ output "mlflow_db_endpoint" {
   description = "RDS endpoint for MLflow backend store"
   value       = module.mlflow_db.endpoint
 }
+
+output "mlflow_db_name" {
+  description = "Name of the MLflow database"
+  value       = module.mlflow_db.db_name
+}

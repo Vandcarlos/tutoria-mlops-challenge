@@ -11,7 +11,7 @@ module "alb_mlflow" {
   listener_protocol     = "HTTP"
   target_group_port     = 5000
   target_group_protocol = "HTTP"
-  health_check_path     = "/"
+  health_check_path     = "/health"
 
   allowed_ingress_cidrs = [
     "0.0.0.0/0"
