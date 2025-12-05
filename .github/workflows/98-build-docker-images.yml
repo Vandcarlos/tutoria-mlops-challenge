@@ -1,4 +1,4 @@
-name: 98 - Build & Push MLflow Image
+name: 98 - Build & Push Docker Images
 
 on:
   workflow_dispatch:
