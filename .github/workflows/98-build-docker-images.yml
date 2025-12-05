@@ -34,7 +34,7 @@ jobs:
     uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
     with:
       ecr-repository: "tutoria-mlops-challenge/prod/mlflow"
-      dockerfile: "docker/mlflow.Dockerfile"
+      dockerfile: "docker/mlflow/.Dockerfile"
       context: "."
       image-tag-suffix: "mlflow"
     secrets:
