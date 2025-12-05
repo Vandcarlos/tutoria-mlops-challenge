@@ -5,6 +5,14 @@ from datetime import datetime, timedelta
 from airflow.models import Variable
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
+from config import (
+    AWS_MODEL_ECS_CONTAINER_NAME,
+    AWS_MODEL_ECS_TASK_DEFINITION,
+    AWS_MODEL_NETWORK_CONFIGURATION,
+    DEFAULT_OWNER,
+    LOCAL,
+)
+from factories.ecs_operator_factory import ecs_operator_factory
 
 from airflow import DAG
 
@@ -24,8 +32,10 @@ Strategy:
 """
 
 
-DEFAULT_OWNER = "mlops-challenge"
 BATCH_INDEX_VARIABLE = "current_batch_index"
+PREPROCESS_BATCH_STEP = "preprocess_batch"
+TRAIN_STEP = "traing"
+EVALUATE_STEP = "evaluate"
 
 
 def get_current_batch_index(**context) -> int:
@@ -78,32 +88,65 @@ with DAG(
         provide_context=True,
     )
 
-    # 2) Preprocess ONLY that batch (calls your existing CLI script)
-    preprocess_batch_task = BashOperator(
-        task_id="preprocess_batch",
-        bash_command=(
-            "cd /opt/airflow && "
-            "python -m src.model.pipeline.preprocess_batch "
-            "{{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }}"
-        ),
-    )
+    if LOCAL:
+        # 2) Preprocess ONLY that batch
+        preprocess_batch_task = BashOperator(
+            task_id=PREPROCESS_BATCH_STEP,
+            bash_command=(
+                "cd /opt/airflow && "
+                "python -m src.model.dispatcher "
+                f"{PREPROCESS_BATCH_STEP} "
+                "{{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }}"
+            ),
+        )
 
-    # 3) Train model using batches 0..current_batch_index
-    #    This leverages train.py logic: --batches N -> uses range(0..N)
-    train_model_task = BashOperator(
-        task_id="train_model",
-        bash_command=(
-            "cd /opt/airflow && "
-            "python -m src.model.pipeline.train "
-            "--batches {{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }}"
-        ),
-    )
+        # 3) Train model using batches 0..current_batch_index
+        #    This leverages train.py logic: --batches N -> uses range(0..N)
+        train_model_task = BashOperator(
+            task_id=TRAIN_STEP,
+            bash_command=(
+                "cd /opt/airflow && "
+                "python -m src.model.dispatcher "
+                f"{TRAIN_STEP} "
+                "--batches {{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }}"
+            ),
+        )
 
-    # 4) Evaluate model on test set (uses your evaluate.py logic)
-    evaluate_model_task = BashOperator(
-        task_id="evaluate_model",
-        bash_command=("cd /opt/airflow && python -m src.model.pipeline.evaluate"),
-    )
+        # 4) Evaluate model on test set
+        evaluate_model_task = BashOperator(
+            task_id=EVALUATE_STEP,
+            bash_command=(
+                f"cd /opt/airflow && python -m src.model.dispatcher {EVALUATE_STEP}"
+            ),
+        )
+    else:
+        preprocess_batch_task = ecs_operator_factory(
+            step_name=PREPROCESS_BATCH_STEP,
+            task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
+            container_name=AWS_MODEL_ECS_CONTAINER_NAME,
+            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
+            extra_args=[
+                "{{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }} "
+            ],
+        )
+
+        train_model_task = ecs_operator_factory(
+            step_name=TRAIN_STEP,
+            task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
+            container_name=AWS_MODEL_ECS_CONTAINER_NAME,
+            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
+            extra_args=[
+                "--batches",
+                "{{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }} ",
+            ],
+        )
+
+        evaluate_model_task = ecs_operator_factory(
+            step_name=EVALUATE_STEP,
+            task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
+            container_name=AWS_MODEL_ECS_CONTAINER_NAME,
+            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
+        )
 
     # 5) Update Airflow Variable for the next run
     increment_batch_index_task = PythonOperator(

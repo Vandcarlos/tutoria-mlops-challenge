@@ -60,15 +60,18 @@ jobs:
         with:
           filters: |
             mlflow:
+              - '.github/workflows/_reusable-build-and-push-ecr.yml'
               - 'docker/mlflow.Dockerfile'
-              - '.github/workflows/98-build-mlflow-image.yml'
             model:
+              - '.github/workflows/_reusable-build-and-push-ecr.yml'
               - 'src/model/**'
               - 'src/shared/**'
             api:
+              - '.github/workflows/_reusable-build-and-push-ecr.yml'
               - 'src/api/**'
               - 'src/shared/**'
             monitoring:
+              - '.github/workflows/_reusable-build-and-push-ecr.yml'
               - 'src/monitoring/**'
               - 'src/shared/**'
 

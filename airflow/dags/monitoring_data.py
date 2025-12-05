@@ -3,6 +3,14 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 from airflow.operators.bash import BashOperator
+from config import (
+    AWS_MONITORING_ECS_CONTAINER_NAME,
+    AWS_MONITORING_ECS_TASK_DEFINITION,
+    AWS_MONITORING_NETWORK_CONFIGURATION,
+    DEFAULT_OWNER,
+    LOCAL,
+)
+from factories.ecs_operator_factory import ecs_operator_factory
 
 from airflow import DAG
 
@@ -19,8 +27,7 @@ All of this is handled inside:
     src.monitoring.generate_drift_reports.main()
 """
 
-DEFAULT_OWNER = "mlops-challenge"
-
+REPORT_STEP = "prediction_drift_report"
 
 with DAG(
     dag_id="monitoring_data_dag",
@@ -35,9 +42,17 @@ with DAG(
     },
     tags=["mlops", "monitoring", "drift"],
 ) as dag:
-    run_prediction_drift_report = BashOperator(
-        task_id="run_prediction_drift_report",
-        bash_command=(
-            "cd /opt/airflow && python -m src.monitoring.generate_drift_reports"
-        ),
-    )
+    if LOCAL:
+        prediction_drift_report = BashOperator(
+            task_id=REPORT_STEP,
+            bash_command=(
+                "cd /opt/airflow && python -m src.monitoring.generate_drift_reports"
+            ),
+        )
+    else:
+        prediction_drift_report = ecs_operator_factory(
+            step_name=REPORT_STEP,
+            task_definition=AWS_MONITORING_ECS_TASK_DEFINITION,
+            container_name=AWS_MONITORING_ECS_CONTAINER_NAME,
+            network_configuration=AWS_MONITORING_NETWORK_CONFIGURATION,
+        )
