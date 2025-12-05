@@ -64,14 +64,17 @@ jobs:
               - 'docker/mlflow.Dockerfile'
             model:
               - '.github/workflows/_reusable-build-and-push-ecr.yml'
+              - 'docker/model.Dockerfile'
               - 'src/model/**'
               - 'src/shared/**'
             api:
               - '.github/workflows/_reusable-build-and-push-ecr.yml'
+              - 'docker/api.Dockerfile'
               - 'src/api/**'
               - 'src/shared/**'
             monitoring:
               - '.github/workflows/_reusable-build-and-push-ecr.yml'
+              - 'docker/monitoring.Dockerfile'
               - 'src/monitoring/**'
               - 'src/shared/**'
 
