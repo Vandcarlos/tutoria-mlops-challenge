@@ -17,6 +17,7 @@ module "model_task" {
   environment = {
     ENVIRONMENT = var.environment
     AWS_REGION  = local.aws_region
+		PYTHONUNBUFFERED = "1"
 
     MLFLOW_TRACKING_URI    = var.mlflow_tracking_uri
     MLFLOW_EXPERIMENT_NAME = "amazon-reviews-model"
