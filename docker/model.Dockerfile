@@ -37,4 +37,4 @@ COPY src/shared ./src/shared
 # ----------------------------
 # Start command
 # ----------------------------
-ENTRYPOINT ["python", "-m"]
+ENTRYPOINT ["python", "-m", "src.model.dispatcher"]

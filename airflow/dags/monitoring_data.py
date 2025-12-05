@@ -6,7 +6,6 @@ from airflow.operators.bash import BashOperator
 from config import (
     AWS_MONITORING_ECS_CONTAINER_NAME,
     AWS_MONITORING_ECS_TASK_DEFINITION,
-    AWS_MONITORING_NETWORK_CONFIGURATION,
     DEFAULT_OWNER,
     LOCAL,
 )
@@ -54,5 +53,4 @@ with DAG(
             step_name=REPORT_STEP,
             task_definition=AWS_MONITORING_ECS_TASK_DEFINITION,
             container_name=AWS_MONITORING_ECS_CONTAINER_NAME,
-            network_configuration=AWS_MONITORING_NETWORK_CONFIGURATION,
         )
