@@ -1,0 +1,78 @@
+name: 98 - Build & Push MLflow Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_mlflow:
+        description: 'Build & push MLflow image'
+        required: true
+        type: boolean
+        default: false
+      build_model:
+        description: 'Build & push Model image'
+        required: true
+        type: boolean
+        default: false
+      build_api:
+        description: 'Build & push API image'
+        required: true
+        type: boolean
+        default: false
+      build_monitoring:
+        description: 'Build & push Monitoring image'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-mlflow:
+    if: ${{ github.event.inputs.build_mlflow == 'true' }}
+    uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
+    with:
+      ecr-repository: "tutoria-mlops-challenge/prod/mlflow"
+      dockerfile: "docker/mlflow.Dockerfile"
+      context: "."
+      image-tag-suffix: "mlflow"
+    secrets:
+      aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}
+
+  deploy-model:
+    if: ${{ github.event.inputs.build_model == 'true' }}
+    uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
+    with:
+      ecr-repository: "tutoria-mlops-challenge/prod/model"
+      dockerfile: "docker/model.Dockerfile"
+      context: "."
+      image-tag-suffix: "model"
+    secrets:
+      aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}
+
+  deploy-api:
+    if: ${{ github.event.inputs.build_api == 'true' }}
+    uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
+    with:
+      ecr-repository: "tutoria-mlops-challenge/prod/api"
+      dockerfile: "docker/api.Dockerfile"
+      context: "."
+      image-tag-suffix: "api"
+    secrets:
+      aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}
+
+  deploy-monitoring:
+    if: ${{ github.event.inputs.build_monitoring == 'true' }}
+    uses: ./.github/workflows/_reusable-build-and-push-ecr.yml
+    with:
+      ecr-repository: "tutoria-mlops-challenge/prod/monitoring"
+      dockerfile: "docker/monitoring.Dockerfile"
+      context: "."
+      image-tag-suffix: "monitoring"
+    secrets:
+      aws-infra-role-arn: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}

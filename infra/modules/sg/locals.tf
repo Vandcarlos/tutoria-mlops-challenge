@@ -3,7 +3,7 @@
 
 locals {
   component = "sg"
-  name    = "${var.name_prefix}-${local.component}"
+  name      = "${var.name_prefix}-${local.component}"
 
   base_tags = {
     Name      = local.name
