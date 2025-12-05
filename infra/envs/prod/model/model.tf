@@ -4,7 +4,7 @@ module "model_task" {
   name = local.name
 
   cpu    = 1024
-  memory = 2048
+  memory = 4096
 
   container_image = "${module.ecr_model.repository_url}:${local.container_name}-latest"
 

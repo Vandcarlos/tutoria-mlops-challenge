@@ -1,8 +1,9 @@
-print("[INGEST] Start module import", flush=True)
 from pathlib import Path
 
 import kagglehub
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 import mlflow
 from src.model.config import (
@@ -20,13 +21,45 @@ from src.model.config import (
 from src.shared.s3_utils import upload_file_to_s3
 
 print("[INGEST] After imports", flush=True)
+
+
+def csv_to_parquet_in_chunks(
+    csv_path: Path, parquet_path: Path, chunksize: int = 100_000
+) -> int:
+    """Convert a large CSV to Parquet using small memory footprints."""
+    print(
+        f"[INGEST] Converting {csv_path} to {parquet_path} in chunks of {chunksize}",
+        flush=True,
+    )
+
+    rows = 0
+    writer = None
+
+    for chunk in pd.read_csv(csv_path, chunksize=chunksize):
+        rows += len(chunk)
+
+        table = pa.Table.from_pandas(chunk)
+
+        if writer is None:
+            writer = pq.ParquetWriter(parquet_path, table.schema)
+
+        writer.write_table(table)
+
+    if writer is not None:
+        writer.close()
+
+    print(f"[INGEST] Finished writing {parquet_path} with {rows} rows", flush=True)
+    return rows
+
+
 def ingest() -> dict:
     print("[INGEST] Enter ingest()", flush=True)
     DATASET_RAW_PATH.mkdir(parents=True, exist_ok=True)
     print("[INGEST] Created raw path", flush=True)
-    
-    print(f"[INGEST] Download dataset: {KAGGLE_DATASET_NAME}")
+
+    print(f"[INGEST] Download dataset: {KAGGLE_DATASET_NAME}", flush=True)
     dataset_path = Path(kagglehub.dataset_download(KAGGLE_DATASET_NAME))
+    print(f"[INGEST] Dataset downloaded to: {dataset_path}", flush=True)
 
     train_src = dataset_path / KAGGLE_DATASET_TRAIN_FILENAME
     test_src = dataset_path / KAGGLE_DATASET_TEST_FILENAME
@@ -40,8 +73,12 @@ def ingest() -> dict:
     df_train = pd.read_csv(train_src)
     df_test = pd.read_csv(test_src)
 
-    train_rows = len(df_train)
-    test_rows = len(df_test)
+    train_rows = csv_to_parquet_in_chunks(
+        train_src, DATASET_RAW_TRAIN_PARQUET, chunksize=100_000
+    )
+    test_rows = csv_to_parquet_in_chunks(
+        test_src, DATASET_RAW_TEST_PARQUET, chunksize=100_000
+    )
 
     df_train.to_parquet(DATASET_RAW_TRAIN_PARQUET, index=False)
     df_test.to_parquet(DATASET_RAW_TEST_PARQUET, index=False)

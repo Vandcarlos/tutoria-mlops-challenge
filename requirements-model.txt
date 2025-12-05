@@ -2,4 +2,5 @@ mlflow==2.21.0
 kagglehub==0.3.13
 pandas==2.3.3
 python-dotenv==1.2.1
-boto3
+boto3==1.42.2
+pyarrow==19.0.1
