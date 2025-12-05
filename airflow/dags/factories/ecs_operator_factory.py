@@ -1,12 +1,16 @@
 from airflow.providers.amazon.aws.operators.ecs import EcsRunTaskOperator
-from config import AWS_CONN_ID, AWS_ECS_CLUSTER, AWS_ECS_LAUNCH_TYPE
+from config import (
+    AWS_CONN_ID,
+    AWS_ECS_CLUSTER,
+    AWS_ECS_LAUNCH_TYPE,
+    AWS_NETWORK_CONFIGURATION,
+)
 
 
 def ecs_operator_factory(
     step_name: str,
     task_definition: str,
     container_name: str,
-    network_configuration: dict,
     extra_args: list[str] = None,
 ) -> EcsRunTaskOperator:
     if extra_args is None:
@@ -19,7 +23,7 @@ def ecs_operator_factory(
         cluster=AWS_ECS_CLUSTER,
         task_definition=task_definition,
         launch_type=AWS_ECS_LAUNCH_TYPE,
-        network_configuration=network_configuration,
+        network_configuration=AWS_NETWORK_CONFIGURATION,
         aws_conn_id=AWS_CONN_ID,
         overrides={
             "containerOverrides": [

@@ -4,7 +4,6 @@ from airflow.operators.bash import BashOperator
 from config import (
     AWS_MODEL_ECS_CONTAINER_NAME,
     AWS_MODEL_ECS_TASK_DEFINITION,
-    AWS_MODEL_NETWORK_CONFIGURATION,
     DEFAULT_OWNER,
     LOCAL,
 )
@@ -40,14 +39,12 @@ with DAG(
             step_name=INGEST_STEP_NAME,
             task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
             container_name=AWS_MODEL_ECS_CONTAINER_NAME,
-            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
         )
 
         split_train_into_batches = ecs_operator_factory(
             step_name=SPLIT_STEP_NAME,
             task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
             container_name=AWS_MODEL_ECS_CONTAINER_NAME,
-            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
         )
 
     ingest_raw_data >> split_train_into_batches

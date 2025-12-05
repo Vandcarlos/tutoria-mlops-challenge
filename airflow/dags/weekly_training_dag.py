@@ -8,7 +8,6 @@ from airflow.operators.python import PythonOperator
 from config import (
     AWS_MODEL_ECS_CONTAINER_NAME,
     AWS_MODEL_ECS_TASK_DEFINITION,
-    AWS_MODEL_NETWORK_CONFIGURATION,
     DEFAULT_OWNER,
     LOCAL,
 )
@@ -124,7 +123,6 @@ with DAG(
             step_name=PREPROCESS_BATCH_STEP,
             task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
             container_name=AWS_MODEL_ECS_CONTAINER_NAME,
-            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
             extra_args=[
                 "{{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }} "
             ],
@@ -134,7 +132,6 @@ with DAG(
             step_name=TRAIN_STEP,
             task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
             container_name=AWS_MODEL_ECS_CONTAINER_NAME,
-            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
             extra_args=[
                 "--batches",
                 "{{ ti.xcom_pull(task_ids='get_current_batch_index', key='batch_index') }} ",
@@ -145,7 +142,6 @@ with DAG(
             step_name=EVALUATE_STEP,
             task_definition=AWS_MODEL_ECS_TASK_DEFINITION,
             container_name=AWS_MODEL_ECS_CONTAINER_NAME,
-            network_configuration=AWS_MODEL_NETWORK_CONFIGURATION,
         )
 
     # 5) Update Airflow Variable for the next run
