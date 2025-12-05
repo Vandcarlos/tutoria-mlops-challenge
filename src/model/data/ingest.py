@@ -1,3 +1,4 @@
+print("[INGEST] Start module import", flush=True)
 from pathlib import Path
 
 import kagglehub
@@ -18,10 +19,12 @@ from src.model.config import (
 )
 from src.shared.s3_utils import upload_file_to_s3
 
-
+print("[INGEST] After imports", flush=True)
 def ingest() -> dict:
+    print("[INGEST] Enter ingest()", flush=True)
     DATASET_RAW_PATH.mkdir(parents=True, exist_ok=True)
-
+    print("[INGEST] Created raw path", flush=True)
+    
     print(f"[INGEST] Download dataset: {KAGGLE_DATASET_NAME}")
     dataset_path = Path(kagglehub.dataset_download(KAGGLE_DATASET_NAME))
 
