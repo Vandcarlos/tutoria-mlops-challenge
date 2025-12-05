@@ -4,9 +4,9 @@
 data "aws_region" "current" {}
 
 locals {
-  name_prefix    = "${var.project_name}-${var.environment}-mlflow"
-  container_name = "mlflow"
-  log_group_name = "/ecs/${local.name_prefix}"
-  aws_region     = data.aws_region.current.name
-
+  component             = "mlflow"
+  name                  = "${local.component}-${var.environment}"
+  container_name        = "mlflow"
+  log_group_name_prefix = "/ecs/${local.name}"
+  aws_region            = data.aws_region.current.name
 }

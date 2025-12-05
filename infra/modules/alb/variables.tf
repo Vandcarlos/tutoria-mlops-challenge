@@ -1,13 +1,8 @@
 // variables.tf
 // Public interface for the generic ALB module.
 
-variable "project_name" {
-  description = "Base project name (e.g. tutoria-mlops)"
-  type        = string
-}
-
-variable "environment" {
-  description = "Environment name (e.g. dev, prod)"
+variable "name_prefix" {
+  description = "Prefix of project (e.g. mlflow)"
   type        = string
 }
 

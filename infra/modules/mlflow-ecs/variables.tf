@@ -3,11 +3,6 @@
 // This module assumes that VPC, ALB, ECS Cluster, RDS and S3 buckets
 // are created by other modules. Here we only compose ECS service + IAM + SG + Logs.
 
-variable "project_name" {
-  description = "Base project name (e.g. tutoria-mlops)"
-  type        = string
-}
-
 variable "environment" {
   description = "Environment name (e.g. dev, prod)"
   type        = string

@@ -1,16 +1,7 @@
-data "aws_caller_identity" "current" {}
-
-locals {
-  mlflow_backend_store_uri = "postgresql+psycopg2://${module.mlflow_db.username}:${var.mlflow_db_password}@${module.mlflow_db.endpoint}:${module.mlflow_db.port}/${module.mlflow_db.db_name}"
-  mlflow_artifact_root     = "s3://${module.mlflow_artifacts_bucket.bucket_name}"
-  aws_account_id           = data.aws_caller_identity.current.account_id
-}
-
 module "mlflow" {
   source = "../../../modules/mlflow-ecs"
 
-  project_name = var.project_name
-  environment  = var.environment
+  environment = var.environment
 
   vpc_id             = var.vpc_id
   private_subnet_ids = var.private_subnet_ids

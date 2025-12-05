@@ -1,8 +1,7 @@
 module "alb_mlflow" {
   source = "../../../modules/alb"
 
-  project_name = var.project_name
-  environment  = var.environment
+  name_prefix = local.name
 
   vpc_id     = var.vpc_id
   subnet_ids = var.public_subnet_ids

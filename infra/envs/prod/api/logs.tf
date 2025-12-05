@@ -5,6 +5,6 @@
 module "logs_api" {
   source = "../../../modules/logs-cloudwatch"
 
-  log_group_name    = local.log_group_name
+  name_prefix       = local.log_group_name_prefix
   retention_in_days = 14
 }

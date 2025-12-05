@@ -5,7 +5,7 @@
 module "mlflow_ecs_service" {
   source = "../ecs-service"
 
-  name_prefix        = local.name_prefix
+  name_prefix        = local.name
   cluster_arn        = var.ecs_cluster_arn
   cpu                = var.container_cpu
   memory             = var.container_memory

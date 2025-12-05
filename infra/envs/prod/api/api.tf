@@ -5,14 +5,14 @@
 module "api_service" {
   source = "../../../modules/ecs-service"
 
-  name_prefix        = local.name_prefix
+  name_prefix        = local.name
   cluster_arn        = var.ecs_cluster_arn
   cpu                = 512
   memory             = 1024
   subnet_ids         = var.private_subnet_ids
   security_group_ids = [module.sg_api.security_group_id]
 
-  container_image = "${module.ecr_api.repository_url}:api-latest"
+  container_image = "${module.ecr_api.repository_url}:${local.container_name}-latest"
   container_name  = local.container_name
   container_port  = 8000
 

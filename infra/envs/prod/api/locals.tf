@@ -3,8 +3,9 @@
 data "aws_region" "current" {}
 
 locals {
-  name_prefix     = "${var.project_name}-${var.environment}-api"
-  container_name  = "api"
-  log_group_name  = "/ecs/${local.name_prefix}"
-  aws_region     = data.aws_region.current.name
+  component             = "api"
+  name                  = "${var.environment}-${local.component}"
+  container_name        = local.component
+  log_group_name_prefix = "/ecs/${local.name}"
+  aws_region            = data.aws_region.current.name
 }

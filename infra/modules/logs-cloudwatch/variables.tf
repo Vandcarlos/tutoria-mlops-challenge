@@ -1,8 +1,8 @@
 // variables.tf
 // Public interface for the generic CloudWatch Logs module.
 
-variable "log_group_name" {
-  description = "Name of the CloudWatch Logs group (e.g. /ecs/tutoria-mlops-prod-mlflow)"
+variable "name_prefix" {
+  description = "prefix name of the CloudWatch Logs group (e.g. /ecs/tutoria-mlops-prod-mlflow)"
   type        = string
 }
 

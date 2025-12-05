@@ -1,5 +1,5 @@
 locals {
-    bucket_name = "${var.project_name}-${var.environment}-data-bucket"
+  bucket_name = "${var.project_name}-${var.environment}-data-bucket"
 }
 
 module "data_bucket" {

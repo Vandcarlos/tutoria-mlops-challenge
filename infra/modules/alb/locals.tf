@@ -2,13 +2,13 @@
 // Naming helpers and base tags for the ALB resources.
 
 locals {
-  name_prefix = "${var.project_name}-${var.environment}-alb"
+  component = "alb"
+  name      = "${var.name_prefix}-${local.component}"
+  tg_name   = "${local.name}-tg"
 
   base_tags = {
-    Project     = var.project_name
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Component   = "alb"
+    Name      = local.name
+    Component = local.component
   }
 
   merged_tags = merge(local.base_tags, var.tags)
