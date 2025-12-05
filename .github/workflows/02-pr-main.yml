@@ -48,7 +48,7 @@ jobs:
       context: "."
       image-tag: "mlflow-ci-test"
       test-port: 5000
-      healthcheck-path: "/health"
+      healthcheck-path: "/"
 
   docker-model-test:
     name: Docker Test - Model
