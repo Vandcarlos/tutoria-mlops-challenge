@@ -10,7 +10,6 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR ${APP_HOME}
 
-
 # ----------------------------
 # Install dependencies
 # ----------------------------
@@ -32,12 +31,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/__init__.py ./src/__init__.py
 COPY src/monitoring ./src/monitoring
 COPY src/shared ./src/shared
-
-# ----------------------------
-# Non-root user (opcional, mas recomendado)
-# ----------------------------
-RUN useradd -m appuser
-USER appuser
 
 # ----------------------------
 # Start command

@@ -1,8 +1,10 @@
 # Dockerfile for MLflow server on AWS ECS
 FROM ghcr.io/mlflow/mlflow:v3.1.1
 
-# Install Postgres driver
-RUN pip install --no-cache-dir psycopg2-binary==2.9.9
+# DB driver + S3 client
+RUN pip install --no-cache-dir \
+    psycopg2-binary==2.9.9 \
+    boto3==1.35.0
 
 # Expose MLflow UI port
 EXPOSE 5000

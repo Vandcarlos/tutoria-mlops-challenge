@@ -1,0 +1,101 @@
+title,message,prediction_label,prediction_label_name,confidence,sentiment,latency_ms
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,378.0269150156528
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,478.6665470455773
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,385.16520598204806
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,377.1198070026003
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,350.66690895473585
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,408.01793697755784
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,400.27846198063344
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,417.1479690121487
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,412.8889540443197
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,398.7632690113969
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,715.2895259787329
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,418.8730850000866
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,400.8127659908496
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,509.09892696654424
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,412.4529989785515
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,357.2789439931512
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,356.61081701982766
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,363.6777959764004
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,492.43666598340496
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,413.33202697569504
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,415.5448460369371
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,348.4367650235072
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,424.7255829977803
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,359.13622903171927
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,361.29434895701706
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,359.5016250037588
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,454.86682100454345
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,507.652243017219
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,1442.5326330238022
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,417.33728401595727
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,480.73690495220944
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,357.32154396828264
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,354.570119001437
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,416.51760501554236
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,414.2441410222091
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,394.3115820293315
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,424.1375059937127
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,393.49467295687646
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,438.64121998194605
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,400.83465998759493
+Great purchase,"Exceeded all my expectations, very happy!",2,POSITIVE,0.9999515581213072,Positivo,393.85584299452603
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,415.62123800395057
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,405.13449301943183
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,413.549022981897
+Amazing,"This product is fantastic, I absolutely love it!",2,POSITIVE,0.9999987030377252,Positivo,405.35505302250385
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,400.0695089926012
+Perfect,Excellent quality and incredible performance.,2,POSITIVE,0.9996766291765999,Positivo,421.63971095578745
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,345.69461399223655
+Five stars,The best product I’ve bought this year.,2,POSITIVE,0.9586175182703989,Positivo,472.3274880088866
+Wonderful,"I am extremely satisfied, highly recommended!",2,POSITIVE,0.9999200432834076,Positivo,407.8478470328264
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,390.55851998273283
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,437.46691499836743
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,416.8863600352779
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,390.89281897759065
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,403.08226202614605
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,411.08156100381166
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,412.70539799006656
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,458.38644000468776
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,361.37875297572464
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,350.1074999803677
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,361.53074901085347
+Terrible,"Worst experience ever, I hate this product.",1,NEGATIVE,0.96348820939741,Negativo,353.8110160152428
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,354.3322539771907
+Terrible,"Worst experience ever, I hate this product.",1,NEGATIVE,0.96348820939741,Negativo,373.1860439875163
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,361.6680880077183
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,384.0311429812573
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,373.2838299474679
+Terrible,"Worst experience ever, I hate this product.",1,NEGATIVE,0.96348820939741,Negativo,494.9415770242922
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,492.02820600476116
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,389.90051997825503
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,360.0598360062577
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,359.80245197424665
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,376.3271030038595
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,380.4141189903021
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,384.07262397231534
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,358.82298898650333
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,440.0215999921784
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,425.1245859777555
+Terrible,"Worst experience ever, I hate this product.",1,NEGATIVE,0.96348820939741,Negativo,408.5409680265002
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,407.79447002569214
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,405.9013449586928
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,410.4366889805533
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,448.6751530203037
+Terrible,"Worst experience ever, I hate this product.",1,NEGATIVE,0.96348820939741,Negativo,368.2269729906693
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,354.4301929650828
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,347.442501981277
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,356.424022000283
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,466.8827540008351
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,812.2669649892487
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,357.71051701158285
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,494.8766799643636
+Terrible,"Worst experience ever, I hate this product.",1,NEGATIVE,0.96348820939741,Negativo,585.8545289956965
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,713.3500380441546
+Horrible,"Terrible quality, arrived broken.",1,NEGATIVE,0.974684477798969,Negativo,360.8989940257743
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,392.229984048754
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,367.2596149845049
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,353.07830304373056
+Disappointed,"Low quality, not worth the money.",1,NEGATIVE,0.9999454261835573,Negativo,373.0707860086113
+Waste of money,"Absolutely not recommended, awful product.",1,NEGATIVE,0.9999999999513365,Negativo,366.0694540012628
+Awful,"Completely useless, very bad purchase.",1,NEGATIVE,0.9999999265776565,Negativo,349.2377119837329

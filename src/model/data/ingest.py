@@ -70,18 +70,12 @@ def ingest() -> dict:
     if not test_src.exists():
         raise FileNotFoundError(f"Test file not found: {test_src}")
 
-    df_train = pd.read_csv(train_src)
-    df_test = pd.read_csv(test_src)
-
     train_rows = csv_to_parquet_in_chunks(
         train_src, DATASET_RAW_TRAIN_PARQUET, chunksize=100_000
     )
     test_rows = csv_to_parquet_in_chunks(
         test_src, DATASET_RAW_TEST_PARQUET, chunksize=100_000
     )
-
-    df_train.to_parquet(DATASET_RAW_TRAIN_PARQUET, index=False)
-    df_test.to_parquet(DATASET_RAW_TEST_PARQUET, index=False)
 
     print(f"[INGEST] train → {DATASET_RAW_TRAIN_PARQUET}")
     print(f"[INGEST] test  → {DATASET_RAW_TEST_PARQUET}")
@@ -92,6 +86,11 @@ def ingest() -> dict:
         "train_rows": train_rows,
         "test_rows": test_rows,
     }
+
+    print(
+        f"[INGEST] S3_DATA_BUCKET={S3_DATA_BUCKET!r}, USE_S3_DATA={USE_S3_DATA}",
+        flush=True,
+    )
 
     if USE_S3_DATA:
         upload_file_to_s3(

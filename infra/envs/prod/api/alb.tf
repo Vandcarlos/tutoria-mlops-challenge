@@ -11,7 +11,7 @@ module "alb_api" {
   listener_protocol     = "HTTP"
   target_group_port     = 8000
   target_group_protocol = "HTTP"
-  health_check_path     = "/"
+  health_check_path     = "/health"
 
   allowed_ingress_cidrs = [
     "0.0.0.0/0"
