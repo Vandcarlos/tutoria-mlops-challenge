@@ -3,7 +3,7 @@
 
 locals {
   component = "logs-cloudwatch"
-  name = "${var.name_prefix}-${local.component}"
+  name      = "${var.name_prefix}-${local.component}"
 
   base_tags = {
     Component = local.component

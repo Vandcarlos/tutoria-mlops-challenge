@@ -9,9 +9,9 @@ module "mlflow_task_sg" {
   vpc_id              = var.vpc_id
   app_port            = var.container_port
   ingress_from_sg_ids = [var.alb_security_group_id]
-  tags = {
 
+  tags = {
     Environment = var.environment
-    ManagedBy = "Terraform"
+    ManagedBy   = "Terraform"
   }
 }

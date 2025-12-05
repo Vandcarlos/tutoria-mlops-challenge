@@ -13,7 +13,7 @@ terraform {
 resource "aws_ecr_repository" "this" {
   name                 = local.repo_name
   image_tag_mutability = var.image_mutability
-  force_delete = true
+  force_delete         = true
 
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
@@ -31,8 +31,8 @@ resource "aws_ecr_lifecycle_policy" "this" {
         rulePriority = 1
         description  = "Keep only the most recent ${var.lifecycle_max_images} images"
         selection = {
-          tagStatus = "any"
-          countType = "imageCountMoreThan"
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
           countNumber = var.lifecycle_max_images
         }
         action = {
