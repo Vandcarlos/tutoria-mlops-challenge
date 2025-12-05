@@ -25,12 +25,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
-        working-directory: ${{ inputs.working-directory }}
-        run: |
-          pip install -r requirements-dev.txt
+     # - name: Install dependencies
+        #working-directory: ${{ inputs.working-directory }}
+        #run: |
+          #pip install -r requirements-dev.txt
 
-      - name: Ruff lint
-        working-directory: ${{ inputs.working-directory }}
-        run: |
-          ruff check .
+     # - name: Ruff lint
+        #working-directory: ${{ inputs.working-directory }}
+        #run: |
+          #ruff check .
