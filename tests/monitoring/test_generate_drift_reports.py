@@ -68,7 +68,7 @@ def test_build_prediction_drift_report_runs_evidently_and_writes_html(
 ):
     """
     build_prediction_drift_report must:
-    - create MONITORING_OUTPUT_PATH
+    - create MONITORING_REPORTS_FOLDER_PATH
     - call Report.run(reference_data=..., current_data=...)
     - call snapshot.save_html with MONITORING_REPORT_PATH
     - return MONITORING_REPORT_PATH
@@ -76,7 +76,8 @@ def test_build_prediction_drift_report_runs_evidently_and_writes_html(
     output_dir = tmp_path / "monitoring"
     report_path = output_dir / "prediction_drift_report.html"
 
-    monkeypatch.setattr(gdr, "MONITORING_OUTPUT_PATH", output_dir, raising=True)
+    # Patch the paths used by the implementation so the test writes only to tmp_path
+    monkeypatch.setattr(gdr, "MONITORING_REPORTS_FOLDER_PATH", output_dir, raising=True)
     monkeypatch.setattr(gdr, "MONITORING_REPORT_PATH", report_path, raising=True)
 
     # Fake Report + snapshot
@@ -129,12 +130,12 @@ def test_log_monitoring_to_mlflow_uses_log_artifacts(monkeypatch, tmp_path):
     """
     log_monitoring_to_mlflow must:
     - open an MLflow run with name 'monitoring_report_local'
-    - call log_artifacts(MONITORING_OUTPUT_PATH, artifact_path='monitoring_reports')
+    - call log_artifacts(MONITORING_REPORTS_FOLDER_PATH, artifact_path='monitoring_reports')
     """
     output_dir = tmp_path / "monitoring"
     output_dir.mkdir()
 
-    monkeypatch.setattr(gdr, "MONITORING_OUTPUT_PATH", output_dir, raising=True)
+    monkeypatch.setattr(gdr, "MONITORING_REPORTS_FOLDER_PATH", output_dir, raising=True)
 
     # Fake mlflow-compatible object
     class FakeMlflow:
