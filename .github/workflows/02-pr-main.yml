@@ -72,6 +72,8 @@ jobs:
       image-tag: "api-ci-test"
       test-port: 8000
       healthcheck-path: "/api/v1/health"
+      extra-env: |
+        ENVIRONMENT=test
 
   docker-monitoring-test:
     name: Docker Test - Monitoring

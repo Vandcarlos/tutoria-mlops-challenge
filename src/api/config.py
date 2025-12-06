@@ -13,7 +13,7 @@ def _bool(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "y"}
 
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "local")  # local | prod
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")  # local | prod | test
 
 # MLflow tracking
 MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")

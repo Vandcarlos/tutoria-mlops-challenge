@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from src.api.config import (
     ALLOW_RUNTIME_MODEL_DOWNLOAD,
+    ENVIRONMENT,
     MLFLOW_MODEL_VERSION,
     MODEL_PATH,
 )
@@ -19,12 +20,13 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI):
         app.state.prediction_logger = prediction_logger
 
-        model = load_model(
-            model_local_path=MODEL_PATH,
-            version=MLFLOW_MODEL_VERSION,
-            allow_runtime_model_download=ALLOW_RUNTIME_MODEL_DOWNLOAD,
-        )
-        app.state.model = model
+        if ENVIRONMENT != "test":
+            model = load_model(
+                model_local_path=MODEL_PATH,
+                version=MLFLOW_MODEL_VERSION,
+                allow_runtime_model_download=ALLOW_RUNTIME_MODEL_DOWNLOAD,
+            )
+            app.state.model = model
 
         yield
 
