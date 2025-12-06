@@ -8,8 +8,13 @@ set -euo pipefail
 echo "[MLFLOW] Backend store URI: ${MLFLOW_BACKEND_STORE_URI}"
 echo "[MLFLOW] Artifact root: ${MLFLOW_ARTIFACT_ROOT}"
 
-echo "[MLFLOW] Running DB migrations..."
-mlflow db upgrade "${MLFLOW_BACKEND_STORE_URI}"
+# Permite pular migrações no CI com MLFLOW_SKIP_DB_MIGRATIONS=true
+if [[ "${MLFLOW_SKIP_DB_MIGRATIONS:-false}" == "true" ]]; then
+  echo "[MLFLOW] Skipping DB migrations because MLFLOW_SKIP_DB_MIGRATIONS=${MLFLOW_SKIP_DB_MIGRATIONS}"
+else
+  echo "[MLFLOW] Running DB migrations..."
+  mlflow db upgrade "${MLFLOW_BACKEND_STORE_URI}"
+fi
 
 echo "[MLFLOW] Starting MLflow server..."
 mlflow server \
