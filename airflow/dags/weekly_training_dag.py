@@ -33,7 +33,7 @@ Strategy:
 
 BATCH_INDEX_VARIABLE = "current_batch_index"
 PREPROCESS_BATCH_STEP = "preprocess_batch"
-TRAIN_STEP = "traing"
+TRAIN_STEP = "train"
 EVALUATE_STEP = "evaluate"
 
 

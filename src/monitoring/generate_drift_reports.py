@@ -5,8 +5,8 @@ import pandas as pd
 
 import mlflow
 from src.monitoring.config import (
-    MONITORING_OUTPUT_PATH,
     MONITORING_REPORT_PATH,
+    MONITORING_REPORTS_FOLDER_PATH,
     REFERENCE_PREDICTIONS_PATH,
     S3_DATA_BUCKET,
     S3_DATA_KEY_MONITORING_REFERENCE,
@@ -65,7 +65,7 @@ def build_prediction_drift_report(
 ) -> str:
     """Generate an Evidently data drift report for predictions."""
 
-    MONITORING_OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
+    MONITORING_REPORTS_FOLDER_PATH.mkdir(parents=True, exist_ok=True)
 
     reference = reference_df[["predicted_label", "confidence"]].copy()
     current = current_df[["predicted_label", "confidence"]].copy()
@@ -97,7 +97,9 @@ def log_monitoring_to_mlflow() -> None:
     """Log monitoring artifacts to MLflow for traceability."""
 
     with mlflow.start_run(run_name="monitoring_report_local"):
-        mlflow.log_artifacts(MONITORING_OUTPUT_PATH, artifact_path="monitoring_reports")
+        mlflow.log_artifacts(
+            MONITORING_REPORTS_FOLDER_PATH, artifact_path="monitoring_reports"
+        )
 
 
 def main() -> None:

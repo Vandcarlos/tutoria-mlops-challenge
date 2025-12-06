@@ -49,6 +49,7 @@ Thumbs.db
 # Utilitários
 # -----------------------------
 .ruff_cache
+.coverage
 
 # -----------------------------
 # Terraform

@@ -25,6 +25,10 @@ with DAG(
     tags=["mlops", "data"],
 ) as dag:
     if LOCAL:
+        print("[CONFIG]: Runing local mode")
+    else:
+        print("[CONFIG]: Runing cloud mode")
+    if LOCAL:
         ingest_raw_data = BashOperator(
             task_id=INGEST_STEP_NAME,
             bash_command=f"cd /opt/airflow && python -m src.model.dispatcher {INGEST_STEP_NAME}",

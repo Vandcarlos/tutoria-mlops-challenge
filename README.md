@@ -53,8 +53,9 @@ Objetivo: entender os dados e selecionar o modelo baseline.
 ### `notebooks/eda_01.ipynb`
 - Baixar amostra do dataset
 - Explorar classes, tamanhos e exemplos
+- Definir qual tipo(s) de modelo será utilizado
 - Criar `full_text = title + text`
-- Treinar 2 modelos baseline:
+- Treinar 2 modelos baseline: (na etapa de definição dos modelos optou-se por modelos lineares)
    - TF-IDF + LogisticRegression
    - TF-IDF + LinearSVC
 - Avaliar métricas:
@@ -130,35 +131,23 @@ Implementar API FastAPI que carrega modelo do MLflow/S3:
 - API FastAPI com endpoints:
   - `POST /predict`
   - `GET /health`
-- Carregamento do modelo versão XX do S3/MLflow, via MLflow Model Artifact
-
-### API Container
-- Dockerfile da API
+- Carregamento do modelo latest do S3/MLflow, via MLflow Model Artifact
 
 ---
 
-## ✔ Fase 5 — Airflow (Orquestração do Pipeline)
+## ✔ Fase 5 — Monitoramento
 
-Airflow rodará *local*, mas orquestrará tarefas na AWS:
+Monitorar:
 
-- ingestão (manual)
-- batch split
-- preprocess
-- treino inicial
-- retraining semanal:
-  `batch_0 → batch_0..1 → batch_0..2 → …`
-
-Cada etapa de ML é executada via **ECS Task**.
-
-> A DAG será única, contendo seções claras para:
->
-> Data Engineering → Training → Retraining.
->
-> Uma única DAG facilita rastreabilidade, versionamento e depuração do pipeline inteiro.
-
----
+- Distribuição de predições (drift)
 
 ## ✔ Fase 6 — Deploy e IaC (Terraform + CI/CD)
+
+Containers:
+- MlFlow
+- Model
+- Training
+- Monitoring
 
 Infra via Terraform:
 
@@ -172,17 +161,25 @@ GitHub Actions:
 - build & push de imagens
 - terraform plan/apply
 - deploy automatizado da API
+- testes com 80% de cobertura
+- lint com ruff
 
 ---
 
-## ✔ Fase 7 — Monitoramento
+## ✔ Fase 7 — Airflow (Orquestração do Pipeline)
 
-Monitorar:
+Airflow rodará *local*, mas orquestrará tarefas na AWS:
 
-- Latência e erros da API
-- Distribuição de predições (drift)
-- Métricas de cada retraining (MLflow)
-- Logs do ECS/Lambda
+- ingestão (manual)
+- batch split
+- preprocess
+- treino inicial
+- retraining semanal:
+  `batch_0 → batch_0..1 → batch_0..2 → …`
+- geração de report de drift
+
+Cada etapa de ML é executada via **ECS Task**.
+Serão 3 Dags
 
 ---
 
@@ -199,7 +196,6 @@ tutoria-mlops-challenge/
 ├── mlflow/             # MLflow local via docker-compose
 ├── infra/              # Terraform (AWS S3, ECR, ECS, IAM, OIDC)
 ├── docker/             # Dockerfiles e configurações auxiliares
-├── docs/               # Documentação para o GitHub Pages
 ├── Makefile            # Comandos úteis
 ├── requirements.txt    # Dependências
 └── README.md
@@ -210,3 +206,4 @@ tutoria-mlops-challenge/
 Agradeço aos tutores pelo apoio, didática e incentivo:
 - Manoel Veríssimo – [verissimomanoel](https://github.com/verissimomanoel)
 - Douglas Batista – [dougbatista](https://github.com/dougbatista)
+- Rafael Teru

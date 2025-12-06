@@ -47,8 +47,12 @@ jobs:
       dockerfile: "docker/mlflow/.Dockerfile"
       context: "."
       image-tag: "mlflow-ci-test"
-      #test-port: 5000
-      #healthcheck-path: "/"
+      test-port: 5000
+      healthcheck-path: "/"
+      extra-env: |
+        MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db
+        MLFLOW_ARTIFACT_ROOT=/mlruns
+        MLFLOW_SKIP_DB_MIGRATIONS=true
 
   docker-model-test:
     name: Docker Test - Model
@@ -67,8 +71,10 @@ jobs:
       dockerfile: "docker/api.Dockerfile"
       context: "."
       image-tag: "api-ci-test"
-      #test-port: 8000
-      #healthcheck-path: "/health"
+      test-port: 8000
+      healthcheck-path: "/api/v1/health"
+      extra-env: |
+        ENVIRONMENT=test
 
   docker-monitoring-test:
     name: Docker Test - Monitoring

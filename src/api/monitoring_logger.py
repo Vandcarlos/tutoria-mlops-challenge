@@ -57,10 +57,13 @@ class LocalPredictionLogger:
 
         print(f"[monitoring_logger] Logging prediction event to {dir_path}")
 
-        file_path = dir_path / f"prediction_{request_id}.json"
+        file_name = f"prediction_{request_id}.json"
+        file_path = dir_path / file_name
         file_path.write_text(json.dumps(event), encoding="utf-8")
 
         if USE_S3_DATA:
             upload_file_to_s3(
-                file_path=file_path, bucket=S3_DATA_BUCKET, key=S3_DATA_KEY_MONITORING
+                file_path=file_path,
+                bucket=S3_DATA_BUCKET,
+                key=f"{S3_DATA_KEY_MONITORING}/{file_name}",
             )
