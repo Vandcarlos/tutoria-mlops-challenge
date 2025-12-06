@@ -52,6 +52,7 @@ jobs:
       extra-env: |
         MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db
         MLFLOW_ARTIFACT_ROOT=/mlruns
+        MLFLOW_SKIP_DB_MIGRATIONS=true
 
   docker-model-test:
     name: Docker Test - Model
